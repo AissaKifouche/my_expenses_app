@@ -59,7 +59,7 @@ class _BudgetCardState extends State<BudgetCard> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "Budget: ${budget.toStringAsFixed(2)}",
+                  "Budget: \$${budget.toStringAsFixed(2)}",
                   style: TextStyle(
                     fontSize: 14.sp,
                     color: Colors.white,
@@ -67,7 +67,7 @@ class _BudgetCardState extends State<BudgetCard> {
                 ),
 
                 Text(
-                  "Remaining: ${left.toStringAsFixed(2)}",
+                  "Remaining: \$${left.toStringAsFixed(2)}",
                   style: TextStyle(
                     fontSize: 14.sp,
                     color: Colors.white,
