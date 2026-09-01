@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:my_expenses/buttom_clipper.dart';
+import 'package:my_expenses/widgets/budget_card.dart';
+import 'package:my_expenses/widgets/transaction_card.dart';
 
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final void Function(int) onNavigateToTab;
+  const HomePage({super.key, required this.onNavigateToTab});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -21,12 +24,14 @@ class _HomePageState extends State<HomePage> {
               Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
+
+                  //the top green container
                   ClipPath(
                     clipper: BottomCurveClipper(),
                     child: Container(
                       height: 260.h,
                       width: double.infinity,
-                      padding: EdgeInsets.all(20),
+                      padding: EdgeInsets.all(20.w),
                       decoration: BoxDecoration(
                         //shape: BoxShape.circle,
                         gradient: LinearGradient(
@@ -61,8 +66,77 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                   ),
+
+                  // a white space to show the budget card and leave a space between it and other elements
+                  SizedBox(height: 100.h,),
+
+                  //row of Recent transactions
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20.w),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Recent Transactions",
+                          style: TextStyle(
+                            fontSize: 20.sp,
+                            color: Colors.black,
+                            fontWeight: FontWeight.w500
+                          ),
+                        ),
+
+                        TextButton(
+                          onPressed: (){
+                            widget.onNavigateToTab(1);
+                          },
+                          child: Text(
+                            "See all",
+                            style: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 14.sp
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  SizedBox(height: 25.h,),
+
+                  //recent transactions
+                  TransactionCard(),
+                  SizedBox(height: 15.h,),
+                  TransactionCard(),
+                  SizedBox(height: 15.h,),
+                  TransactionCard(),
+                  SizedBox(height: 15.h,),
+                  TransactionCard(),
+                  SizedBox(height: 15.h,),
+                  TransactionCard(),
+                  SizedBox(height: 15.h,),TransactionCard(),
+                  SizedBox(height: 15.h,),
+                  TransactionCard(),
+                  SizedBox(height: 15.h,),
+                  TransactionCard(),
+                  SizedBox(height: 15.h,),
+                  TransactionCard(),
+                  SizedBox(height: 15.h,),
+                  TransactionCard(),
+                  SizedBox(height: 15.h,),
+                  TransactionCard(),
+                  SizedBox(height: 15.h,),
+
                 ],
-              )
+              ),
+              Positioned(
+                top: 120.h,
+                left: 0.w,
+                right: 0.w,
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  child: BudgetCard(),
+                ),
+              ),
             ],
           ),
         ),

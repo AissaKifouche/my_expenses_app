@@ -29,7 +29,7 @@ class _MainShellState extends State<MainShell> {
       body: IndexedStack(
         index: _selectedIndex,
         children: [
-          HomePage(),
+          HomePage(onNavigateToTab: onItemTapped,),
           StatsPage(),
           WalletPage(),
           SettingsPage(),
