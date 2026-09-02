@@ -42,7 +42,6 @@ class _HomePageState extends State<HomePage> {
                           width: double.infinity,
                           padding: EdgeInsets.symmetric(horizontal:  20.w, vertical: 35.h),
                           decoration: BoxDecoration(
-                            //shape: BoxShape.circle,
                             gradient: LinearGradient(
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
