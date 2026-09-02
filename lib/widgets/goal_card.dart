@@ -48,6 +48,7 @@ class _GoalCardState extends State<GoalCard> {
   @override
   Widget build(BuildContext context) {
     return InkWell(
+      borderRadius: BorderRadius.circular(20.r),
       onTap: (){
         //TBD
       },
