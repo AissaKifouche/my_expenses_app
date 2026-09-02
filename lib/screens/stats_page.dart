@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:my_expenses/widgets/day_stats.dart';
+import 'package:my_expenses/widgets/month_stats.dart';
+import 'package:my_expenses/widgets/week_stats.dart';
+import 'package:my_expenses/widgets/year_stats.dart';
 
 
 enum TimeFilter {day, week, month, year}
@@ -15,6 +19,19 @@ class StatsPage extends StatefulWidget {
 class _StatsPageState extends State<StatsPage> {
 
   TimeFilter selectedFilter = TimeFilter.day;
+
+  Widget _buildFilteredLayout(){
+    switch(selectedFilter){
+      case TimeFilter.day :
+        return DayStats();
+      case TimeFilter.week:
+        return WeekStats();
+      case TimeFilter.month:
+        return MonthStats();
+      case TimeFilter.year:
+        return YearStats();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -67,6 +84,10 @@ class _StatsPageState extends State<StatsPage> {
                   );
                 }).toList(),
               ),
+
+              SizedBox(height: 30.h,),
+
+              _buildFilteredLayout(),
             ],
           ),
         ),
