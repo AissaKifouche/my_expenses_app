@@ -4,6 +4,7 @@ import 'package:my_expenses/widgets/day_stats.dart';
 import 'package:my_expenses/widgets/month_stats.dart';
 import 'package:my_expenses/widgets/week_stats.dart';
 import 'package:my_expenses/widgets/year_stats.dart';
+import 'package:flutter_utils/flutter_utils.dart';
 
 
 enum TimeFilter {day, week, month, year}
@@ -88,6 +89,26 @@ class _StatsPageState extends State<StatsPage> {
               SizedBox(height: 30.h,),
 
               _buildFilteredLayout(),
+              
+              TextButton(
+                onPressed: (){
+                  //TBD, loads more transactions
+                },
+                child: GradientText(
+                  "Load More",
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.black,
+                      Colors.white
+                    ]
+                  ),
+                  style: TextStyle(
+                    fontSize: 16.sp
+                  ),
+                ),
+              ),
             ],
           ),
         ),
