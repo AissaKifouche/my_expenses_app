@@ -144,7 +144,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "1ae550b65c96027f11ca3c1d88b26fbc4876e804"
+      resolved-ref: "5d1a20d4dd261df060657b090a1ac645c0759246"
       url: "https://github.com/AissaKifouche/flutter_utils.git"
     source: git
     version: "0.0.1"

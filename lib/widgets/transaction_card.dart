@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:my_expenses/models/transaction.dart';
+import 'package:flutter_utils/flutter_utils.dart';
 
 class TransactionCard extends StatefulWidget {
-  const TransactionCard({super.key});
+  final Transaction transaction;
+  const TransactionCard({super.key, required this.transaction});
 
   @override
   State<TransactionCard> createState() => _TransactionCardState();
@@ -29,7 +32,7 @@ class _TransactionCardState extends State<TransactionCard> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "Food",
+                  widget.transaction.title,
                   style: TextStyle(
                     fontSize: 18.sp,
                     color: Colors.black,
@@ -39,7 +42,7 @@ class _TransactionCardState extends State<TransactionCard> {
                 SizedBox(height: 6.h,),
 
                 Text(
-                  "Yesterday",
+                  Times.formatRelativeDate(widget.transaction.dateTime),
                   style: TextStyle(
                     fontSize: 14.sp,
                     color: Colors.grey[800],
@@ -49,10 +52,10 @@ class _TransactionCardState extends State<TransactionCard> {
             ),
 
             Text(
-              "-\$ 85.00",
+              ( widget.transaction.transactionType == TransactionType.expense ) ? "-\$ ${widget.transaction.amount}" : "\$ ${widget.transaction.amount}",
               style: TextStyle(
                 fontSize: 20.sp,
-                color: Colors.redAccent,
+                color: ( widget.transaction.transactionType == TransactionType.expense ) ? Colors.redAccent : Colors.greenAccent,
                 fontWeight: FontWeight.w500
               ),
             )

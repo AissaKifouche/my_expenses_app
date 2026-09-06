@@ -3,6 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:my_expenses/widgets/transaction_card.dart';
 
+import '../models/transaction.dart';
+
 class DayStats extends StatefulWidget {
   const DayStats({super.key});
 
@@ -11,6 +13,21 @@ class DayStats extends StatefulWidget {
 }
 
 class _DayStatsState extends State<DayStats> {
+
+  final List<Transaction> transactions = [
+    Transaction(title: "title", transactionType: TransactionType.expense, category: Category.bills, dateTime: DateTime.now(), amount: 85),
+    Transaction(title: "title", transactionType: TransactionType.expense, category: Category.bills, dateTime: DateTime.now(), amount: 85),
+    Transaction(title: "title", transactionType: TransactionType.income, category: Category.bills, dateTime: DateTime.now(), amount: 85),
+    Transaction(title: "title", transactionType: TransactionType.expense, category: Category.bills, dateTime: DateTime.now(), amount: 85),
+    Transaction(title: "title", transactionType: TransactionType.expense, category: Category.bills, dateTime: DateTime.now(), amount: 85),
+    Transaction(title: "title", transactionType: TransactionType.expense, category: Category.bills, dateTime: DateTime.now(), amount: 85),
+    Transaction(title: "title", transactionType: TransactionType.income, category: Category.bills, dateTime: DateTime.now(), amount: 85),
+    Transaction(title: "title", transactionType: TransactionType.expense, category: Category.bills, dateTime: DateTime.now(), amount: 85),
+    Transaction(title: "title", transactionType: TransactionType.expense, category: Category.bills, dateTime: DateTime.now(), amount: 85),
+    Transaction(title: "title", transactionType: TransactionType.expense, category: Category.bills, dateTime: DateTime.now(), amount: 85),
+
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -36,35 +53,25 @@ class _DayStatsState extends State<DayStats> {
 
         SizedBox(height: 25.h,),
 
-        TransactionCard(),
+        TransactionCard(transaction: transactions[0],),
         SizedBox(height: 15.h,),
-        TransactionCard(),
+        TransactionCard(transaction: transactions[1],),
         SizedBox(height: 15.h,),
-        TransactionCard(),
+        TransactionCard(transaction: transactions[2],),
         SizedBox(height: 15.h,),
-        TransactionCard(),
+        TransactionCard(transaction: transactions[3],),
         SizedBox(height: 15.h,),
-        TransactionCard(),
+        TransactionCard(transaction: transactions[4],),
         SizedBox(height: 15.h,),
-        TransactionCard(),
+        TransactionCard(transaction: transactions[5],),
         SizedBox(height: 15.h,),
-        TransactionCard(),
+        TransactionCard(transaction: transactions[6],),
         SizedBox(height: 15.h,),
-        TransactionCard(),
+        TransactionCard(transaction: transactions[7],),
         SizedBox(height: 15.h,),
-        TransactionCard(),
+        TransactionCard(transaction: transactions[8],),
         SizedBox(height: 15.h,),
-        TransactionCard(),
-        SizedBox(height: 15.h,),
-        TransactionCard(),
-        SizedBox(height: 15.h,),
-        TransactionCard(),
-        SizedBox(height: 15.h,),
-        TransactionCard(),
-        SizedBox(height: 15.h,),
-        TransactionCard(),
-        SizedBox(height: 15.h,),
-        TransactionCard(),
+        TransactionCard(transaction: transactions[09],),
         SizedBox(height: 15.h,),
 
       ],
