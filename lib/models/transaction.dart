@@ -1,3 +1,5 @@
+import 'package:uuid/uuid.dart';
+
 enum TransactionType {income, expense}
 
 enum Category {
@@ -10,6 +12,7 @@ enum Category {
 }
 
 class Transaction {
+  final String id;
   final String title;
   final TransactionType transactionType;
   final Category category;
@@ -24,5 +27,5 @@ class Transaction {
     required this.dateTime,
     required this.amount,
     this.note,
-});
+}): id = Uuid().v4();
 }
