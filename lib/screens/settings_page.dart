@@ -22,54 +22,30 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
-        statusBarIconBrightness: Brightness.dark
+        statusBarIconBrightness: Brightness.light
       ),
       child: Scaffold(
+
+        appBar: AppBar(
+          backgroundColor: Color(0xFF219289),
+          title: Text(
+            "Settings",
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 28.sp,
+            ),
+          ),
+        ),
         //backgroundColor: Colors.white,
         body: SafeArea(
           child: SingleChildScrollView(
             child: Column(
               children: [
-                ClipPath(
-                  clipper: BottomCurveClipper(),
-                  child: Container(
-                    alignment: Alignment.center,
-                    height: 300.h,
-                    width: double.infinity,
-                    padding: EdgeInsets.symmetric(horizontal:  20.w, vertical: 35.h),
-                    decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [
-                              Color(0xFF429690),
-                              Color(0xFF058E84),
-                            ]
-                        )
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        CircleAvatar(
-                          radius: 75.r,
-                          child: SvgPicture.asset("assets/images/avatar.svg", height: 150.h, width: 150.w,),
-                        ),
-
-                        Text(
-                          "Dexter Morgan",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 22.sp
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                ),
 
                 SizedBox(height: 30.h,),
 
-                Padding(
+                //no dark mode implementation for now
+                /*Padding(
                   padding:  EdgeInsets.symmetric(horizontal: 20.h),
                     child: Container(
                       decoration: BoxDecoration(
@@ -100,7 +76,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         ],
                       ),
                     ),
-                ),
+                ),*/
 
                 SizedBox(height: 15.h,),
 

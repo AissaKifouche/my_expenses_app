@@ -77,14 +77,7 @@ class _HomePageState extends State<HomePage> {
                                   color: Colors.white,
                                 ),
                               ),
-                              SizedBox(height: 5.h,),
-                              Text(
-                                'Dexter Morgan',
-                                style: TextStyle(
-                                  fontSize: 22.sp,
-                                  color: Colors.white,
-                                ),
-                              )
+
                             ],
                           ),
                         ),
