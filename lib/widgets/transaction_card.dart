@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:my_expenses/models/transaction.dart';
 import 'package:flutter_utils/flutter_utils.dart';
+import 'package:my_expenses/screens/transaction_details.dart';
 
 class TransactionCard extends StatefulWidget {
   final Transaction transaction;
@@ -14,9 +15,15 @@ class TransactionCard extends StatefulWidget {
 class _TransactionCardState extends State<TransactionCard> {
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return InkWell(
+      borderRadius: BorderRadius.circular(15.r),
       onTap: (){
-        //tbd, opens the full details of a transaction
+        Navigator.push(
+            context, 
+            MaterialPageRoute(
+              builder: (context) => TransactionDetails(),
+            )
+        );
       },
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 5.h),
