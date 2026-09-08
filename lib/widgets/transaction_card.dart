@@ -21,7 +21,7 @@ class _TransactionCardState extends State<TransactionCard> {
         Navigator.push(
             context, 
             MaterialPageRoute(
-              builder: (context) => TransactionDetails(),
+              builder: (context) => TransactionDetailPage(transaction: widget.transaction),
             )
         );
       },
