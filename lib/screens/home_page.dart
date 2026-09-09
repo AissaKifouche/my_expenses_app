@@ -40,6 +40,13 @@ class _HomePageState extends State<HomePage> {
         statusBarIconBrightness: Brightness.dark
       ),
       child: Scaffold(
+        floatingActionButton: FloatingActionButton(
+          onPressed: (){
+            // TODO: make a bottom sheet to add a transaction
+          },
+          backgroundColor: Color(0xFF2F948D),
+          child: Icon(Icons.add, color: Colors.white, size: 40.h,),
+        ),
         body: Stack(
           children: [
             SingleChildScrollView(
