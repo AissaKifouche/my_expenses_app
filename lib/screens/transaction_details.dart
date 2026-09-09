@@ -134,35 +134,43 @@ class TransactionDetailPage extends StatelessWidget {
 
   static String _categoryLabel(Category c) {
     switch (c) {
-      case Category.food:
-        return 'Food';
+      case Category.shopping:
+        return 'Shopping';
       case Category.bills:
         return 'Bills';
       case Category.entertainment:
         return 'Entertainment';
       case Category.studies:
         return 'Studies';
-      case Category.travel:
-        return 'Travel';
+      case Category.transport:
+        return 'Transport';
       case Category.other:
         return 'Other';
+      case Category.salary:
+        return "Salary";
+      case Category.freelance:
+        return "Freelance";
     }
   }
 
   static IconData _categoryIcon(Category c) {
     switch (c) {
-      case Category.food:
-        return Icons.restaurant_rounded;
+      case Category.shopping:
+        return Icons.shopping_bag_rounded;
       case Category.bills:
         return Icons.receipt_long_rounded;
       case Category.entertainment:
-        return Icons.movie_creation_outlined;
+        return Icons.movie_creation_rounded;
       case Category.studies:
-        return Icons.school_outlined;
-      case Category.travel:
-        return Icons.flight_takeoff_rounded;
+        return Icons.school_rounded;
+      case Category.transport:
+        return Icons.directions_bus_rounded;
       case Category.other:
-        return Icons.category_outlined;
+        return Icons.category_rounded;
+      case Category.salary:
+        return Icons.account_balance_wallet_rounded; // steady/institutional income
+      case Category.freelance:
+        return Icons.laptop_mac_rounded; // project/gig-based work
     }
   }
 

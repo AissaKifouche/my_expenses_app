@@ -3,11 +3,13 @@ import 'package:uuid/uuid.dart';
 enum TransactionType {income, expense}
 
 enum Category {
-  food,
+  shopping,
   bills,
   entertainment,
   studies,
-  travel,
+  transport,
+  salary,
+  freelance,
   other,
 }
 
