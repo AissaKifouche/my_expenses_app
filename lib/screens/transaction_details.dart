@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:my_expenses/models/transaction.dart'; // adjust path to your model file
 
@@ -18,110 +19,115 @@ class TransactionDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: _bg,
-      body: CustomScrollView(
-        slivers: [
-          SliverToBoxAdapter(child: _Header(transaction: transaction, accent: _accent, isIncome: _isIncome)),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(20.w, 28.h, 20.w, 32.h),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _SectionCard(
-                    children: [
-                      _DetailRow(
-                        label: 'Category',
-                        value: _categoryLabel(transaction.category),
-                        icon: _categoryIcon(transaction.category),
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle(
+        statusBarIconBrightness: Brightness.light
+      ),
+      child: Scaffold(
+        backgroundColor: _bg,
+        body: CustomScrollView(
+          slivers: [
+            SliverToBoxAdapter(child: _Header(transaction: transaction, accent: _accent, isIncome: _isIncome)),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(20.w, 28.h, 20.w, 32.h),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _SectionCard(
+                      children: [
+                        _DetailRow(
+                          label: 'Category',
+                          value: _categoryLabel(transaction.category),
+                          icon: _categoryIcon(transaction.category),
+                        ),
+                        const _RowDivider(),
+                        _DetailRow(
+                          label: 'Type',
+                          value: _isIncome ? 'Income' : 'Expense',
+                          icon: _isIncome ? Icons.south_west_rounded : Icons.north_east_rounded,
+                        ),
+                        const _RowDivider(),
+                        _DetailRow(
+                          label: 'Date',
+                          value: _formatDate(transaction.dateTime),
+                          icon: Icons.calendar_today_rounded,
+                        ),
+                        const _RowDivider(),
+                        _DetailRow(
+                          label: 'Time',
+                          value: _formatTime(transaction.dateTime),
+                          icon: Icons.schedule_rounded,
+                        ),
+                      ],
+                    ),
+                    if (transaction.note != null && transaction.note!.trim().isNotEmpty) ...[
+                      SizedBox(height: 20.h),
+                      Text(
+                        'Note',
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black54,
+                        ),
                       ),
-                      const _RowDivider(),
-                      _DetailRow(
-                        label: 'Type',
-                        value: _isIncome ? 'Income' : 'Expense',
-                        icon: _isIncome ? Icons.south_west_rounded : Icons.north_east_rounded,
-                      ),
-                      const _RowDivider(),
-                      _DetailRow(
-                        label: 'Date',
-                        value: _formatDate(transaction.dateTime),
-                        icon: Icons.calendar_today_rounded,
-                      ),
-                      const _RowDivider(),
-                      _DetailRow(
-                        label: 'Time',
-                        value: _formatTime(transaction.dateTime),
-                        icon: Icons.schedule_rounded,
+                      SizedBox(height: 8.h),
+                      Container(
+                        width: double.infinity,
+                        padding: EdgeInsets.all(16.w),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16.r),
+                        ),
+                        child: Text(
+                          transaction.note!,
+                          style: TextStyle(fontSize: 15.sp, color: Colors.black87, height: 1.4),
+                        ),
                       ),
                     ],
-                  ),
-                  if (transaction.note != null && transaction.note!.trim().isNotEmpty) ...[
-                    SizedBox(height: 20.h),
-                    Text(
-                      'Note',
-                      style: TextStyle(
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black54,
-                      ),
-                    ),
-                    SizedBox(height: 8.h),
-                    Container(
-                      width: double.infinity,
-                      padding: EdgeInsets.all(16.w),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16.r),
-                      ),
-                      child: Text(
-                        transaction.note!,
-                        style: TextStyle(fontSize: 15.sp, color: Colors.black87, height: 1.4),
-                      ),
+                    SizedBox(height: 32.h),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            onPressed: () {
+                              // TODO: hook up edit flow
+                            },
+                            icon: const Icon(Icons.edit_outlined, size: 18),
+                            label: const Text('Edit'),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: _tealDark,
+                              side: BorderSide(color: _tealDark.withValues(alpha: 0.4)),
+                              padding: EdgeInsets.symmetric(vertical: 14.h),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 12.w),
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            onPressed: () {
+                              // TODO: hook up delete flow
+                            },
+                            icon: const Icon(Icons.delete_outline_rounded, size: 18),
+                            label: const Text('Delete'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFFFBEAE6),
+                              foregroundColor: const Color(0xFFB3402B),
+                              elevation: 0,
+                              padding: EdgeInsets.symmetric(vertical: 14.h),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
-                  SizedBox(height: 32.h),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: () {
-                            // TODO: hook up edit flow
-                          },
-                          icon: const Icon(Icons.edit_outlined, size: 18),
-                          label: const Text('Edit'),
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: _tealDark,
-                            side: BorderSide(color: _tealDark.withValues(alpha: 0.4)),
-                            padding: EdgeInsets.symmetric(vertical: 14.h),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 12.w),
-                      Expanded(
-                        child: ElevatedButton.icon(
-                          onPressed: () {
-                            // TODO: hook up delete flow
-                          },
-                          icon: const Icon(Icons.delete_outline_rounded, size: 18),
-                          label: const Text('Delete'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFFFBEAE6),
-                            foregroundColor: const Color(0xFFB3402B),
-                            elevation: 0,
-                            padding: EdgeInsets.symmetric(vertical: 14.h),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
