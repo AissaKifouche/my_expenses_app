@@ -92,7 +92,7 @@ class TransactionDetailPage extends StatelessWidget {
                           label: const Text('Edit'),
                           style: OutlinedButton.styleFrom(
                             foregroundColor: _tealDark,
-                            side: BorderSide(color: _tealDark.withOpacity(0.4)),
+                            side: BorderSide(color: _tealDark.withValues(alpha: 0.4)),
                             padding: EdgeInsets.symmetric(vertical: 14.h),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
                           ),
@@ -242,7 +242,7 @@ class _SectionCard extends StatelessWidget {
       width: double.infinity,
       padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 6.h),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Colors.white30,
         borderRadius: BorderRadius.circular(18.r),
       ),
       child: Column(children: children),
@@ -282,6 +282,6 @@ class _RowDivider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Divider(height: 1, thickness: 1, color: Color(0xFFF0F0F0));
+    return Divider(height: 10.h, thickness: 1, color: Color(0xFFF0F0F0));
   }
 }

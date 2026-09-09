@@ -59,7 +59,7 @@ class _TransactionCardState extends State<TransactionCard> {
             ),
 
             Text(
-              ( widget.transaction.transactionType == TransactionType.expense ) ? "-\$ ${widget.transaction.amount}" : "\$ ${widget.transaction.amount}",
+              ( widget.transaction.transactionType == TransactionType.expense ) ? "-\$ ${widget.transaction.amount}" : "+\$ ${widget.transaction.amount}",
               style: TextStyle(
                 fontSize: 20.sp,
                 color: ( widget.transaction.transactionType == TransactionType.expense ) ? Colors.redAccent : Colors.greenAccent,
