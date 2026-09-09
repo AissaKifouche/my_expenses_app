@@ -38,8 +38,8 @@ class TransactionDetailPage extends StatelessWidget {
                       children: [
                         _DetailRow(
                           label: 'Category',
-                          value: _categoryLabel(transaction.category),
-                          icon: _categoryIcon(transaction.category),
+                          value: categoryLabel(transaction.category),
+                          icon: categoryIcon(transaction.category),
                         ),
                         const _RowDivider(),
                         _DetailRow(
@@ -132,7 +132,7 @@ class TransactionDetailPage extends StatelessWidget {
     );
   }
 
-  static String _categoryLabel(Category c) {
+  static String categoryLabel(Category c) {
     switch (c) {
       case Category.shopping:
         return 'Shopping';
@@ -153,7 +153,7 @@ class TransactionDetailPage extends StatelessWidget {
     }
   }
 
-  static IconData _categoryIcon(Category c) {
+  static IconData categoryIcon(Category c) {
     switch (c) {
       case Category.shopping:
         return Icons.shopping_bag_rounded;
