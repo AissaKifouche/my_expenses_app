@@ -21,15 +21,7 @@ class _HomePageState extends State<HomePage> {
   final List<Transaction> transactions = [
     Transaction(title: "title", transactionType: TransactionType.expense, category: Category.bills, dateTime: DateTime.now(), amount: 85),
     Transaction(title: "title", transactionType: TransactionType.expense, category: Category.bills, dateTime: DateTime.now(), amount: 85),
-    Transaction(title: "title", transactionType: TransactionType.income, category: Category.bills, dateTime: DateTime.now(), amount: 85),
-    Transaction(title: "title", transactionType: TransactionType.expense, category: Category.bills, dateTime: DateTime.now(), amount: 85),
-    Transaction(title: "title", transactionType: TransactionType.expense, category: Category.bills, dateTime: DateTime.now(), amount: 85),
-    Transaction(title: "title", transactionType: TransactionType.expense, category: Category.bills, dateTime: DateTime.now(), amount: 85),
-    Transaction(title: "title", transactionType: TransactionType.income, category: Category.bills, dateTime: DateTime.now(), amount: 85),
-    Transaction(title: "title", transactionType: TransactionType.expense, category: Category.bills, dateTime: DateTime.now(), amount: 85),
-    Transaction(title: "title", transactionType: TransactionType.expense, category: Category.bills, dateTime: DateTime.now(), amount: 85),
-    Transaction(title: "title", transactionType: TransactionType.expense, category: Category.bills, dateTime: DateTime.now(), amount: 85),
-
+    Transaction(title: "title", transactionType: TransactionType.income, category: Category.salary, dateTime: DateTime.now(), amount: 85),
   ];
 
   @override
@@ -42,18 +34,24 @@ class _HomePageState extends State<HomePage> {
       ),
       child: Scaffold(
         floatingActionButton: FloatingActionButton(
-          onPressed: (){
-            showModalBottomSheet(
+          onPressed: () async {
+            final newTransaction = await showModalBottomSheet<Transaction>(
               useSafeArea: true,
               isScrollControlled: true,
               constraints: BoxConstraints(
-                maxHeight: MediaQuery.of(context).size.height * 0.7,
+                maxHeight: MediaQuery.of(context).size.height * 0.7 ,
               ),
               context: context,
               builder: (context) {
                 return AddTransactionSheet();
               }
             );
+
+            if(newTransaction != null){
+              setState(() {
+                transactions.insert(0, newTransaction);
+              });
+            }
           },
           backgroundColor: Color(0xFF2F948D),
           child: Icon(Icons.add, color: Colors.white, size: 40.h,),
@@ -139,26 +137,17 @@ class _HomePageState extends State<HomePage> {
                             SizedBox(height: 25.h,),
 
                             //recent transactions
-                            TransactionCard(transaction: transactions[0],),
-                            SizedBox(height: 15.h,),
-                            TransactionCard(transaction: transactions[1],),
-                            SizedBox(height: 15.h,),
-                            TransactionCard(transaction: transactions[2],),
-                            SizedBox(height: 15.h,),
-                            TransactionCard(transaction: transactions[3],),
-                            SizedBox(height: 15.h,),
-                            TransactionCard(transaction: transactions[4],),
-                            SizedBox(height: 15.h,),
-                            TransactionCard(transaction: transactions[5],),
-                            SizedBox(height: 15.h,),
-                            TransactionCard(transaction: transactions[6],),
-                            SizedBox(height: 15.h,),
-                            TransactionCard(transaction: transactions[7],),
-                            SizedBox(height: 15.h,),
-                            TransactionCard(transaction: transactions[8],),
-                            SizedBox(height: 15.h,),
-                            TransactionCard(transaction: transactions[09],),
-                            SizedBox(height: 15.h,),
+                            if (transactions.isEmpty)
+                              Text(
+                                'No transaction at the moment',
+                              )
+                            else
+                              ...transactions.map((transaction) {
+                                return Padding(
+                                  padding: EdgeInsets.only(bottom: 15.h),
+                                  child: TransactionCard(transaction: transaction),
+                                );
+                              }),
                           ],
                         ),
                       ),
