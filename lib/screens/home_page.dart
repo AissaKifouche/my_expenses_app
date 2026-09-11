@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:my_expenses/buttom_clipper.dart';
 import 'package:my_expenses/models/transaction.dart';
+import 'package:my_expenses/screens/add_transaction_sheet.dart';
 import 'package:my_expenses/widgets/budget_card.dart';
 import 'package:my_expenses/widgets/transaction_card.dart';
 
@@ -42,7 +43,17 @@ class _HomePageState extends State<HomePage> {
       child: Scaffold(
         floatingActionButton: FloatingActionButton(
           onPressed: (){
-            // TODO: make a bottom sheet to add a transaction
+            showModalBottomSheet(
+              useSafeArea: true,
+              isScrollControlled: true,
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(context).size.height * 0.7,
+              ),
+              context: context,
+              builder: (context) {
+                return AddTransactionSheet();
+              }
+            );
           },
           backgroundColor: Color(0xFF2F948D),
           child: Icon(Icons.add, color: Colors.white, size: 40.h,),
