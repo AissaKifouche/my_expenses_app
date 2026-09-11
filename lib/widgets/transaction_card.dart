@@ -7,7 +7,8 @@ import 'package:my_expenses/screens/transaction_details.dart';
 class TransactionCard extends StatelessWidget {
   final Transaction transaction;
   final Function(String) onDelete;
-  const TransactionCard({super.key, required this.transaction, required this.onDelete});
+  final Function(Transaction) onUpdate;
+  const TransactionCard({super.key, required this.transaction, required this.onDelete, required this.onUpdate});
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +18,7 @@ class TransactionCard extends StatelessWidget {
         Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => TransactionDetailPage(transaction: transaction, onDelete: onDelete,),
+              builder: (context) => TransactionDetailPage(transaction: transaction, onDelete: onDelete, onUpdate: onUpdate,),
             )
         );
       },

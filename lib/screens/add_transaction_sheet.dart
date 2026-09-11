@@ -7,7 +7,10 @@ import 'package:my_expenses/screens/transaction_details.dart';
 
 
 class AddTransactionSheet extends StatefulWidget {
-  const AddTransactionSheet({super.key});
+
+  final Transaction? initialTransaction;
+
+  const AddTransactionSheet({super.key, this.initialTransaction});
 
   @override
   State<AddTransactionSheet> createState() => _AddTransactionSheetState();
@@ -18,15 +21,35 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
   static const _expense = Colors.red;
 
   final _formKey = GlobalKey<FormState>();
-  final _titleController = TextEditingController();
-  final _amountController = TextEditingController();
-  final _noteController = TextEditingController();
+  late final TextEditingController _titleController ;
+  late final TextEditingController _amountController ;
+  late final TextEditingController _noteController ;
 
-  TransactionType _type = TransactionType.expense;
-  Category _category = Category.shopping;
-  DateTime _dateTime = DateTime.now();
+  late TransactionType _type;
+  late Category _category ;
+  late DateTime _dateTime ;
+
+  bool get isEditing => widget.initialTransaction != null;
 
   Color get _accent => _type == TransactionType.income ? _teal : _expense;
+
+  @override
+  void initState(){
+    super.initState();
+    final t = widget.initialTransaction;
+
+    _titleController = TextEditingController(text: t?.title ?? '');
+    _amountController = TextEditingController(
+      text: t != null ? t.amount.toStringAsFixed(2) : '',
+    );
+    _noteController = TextEditingController(text: t?.note ?? '');
+
+    _type = t?.transactionType ?? TransactionType.expense;
+    _category = t?.category ?? Category.shopping;
+    _dateTime = t?.dateTime ?? DateTime.now();
+  }
+
+
 
   @override
   void dispose() {
@@ -81,15 +104,36 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
 
   void _save() {
     if (!_formKey.currentState!.validate()) return;
-    final transaction = Transaction(
-      title: _titleController.text.trim(),
-      transactionType: _type,
-      category: _category,
-      dateTime: _dateTime,
-      amount: double.parse(_amountController.text.trim()),
-      note: _noteController.text.trim().isEmpty ? null : _noteController.text.trim(),
-    );
-    Navigator.of(context).pop(transaction);
+
+    final title = _titleController.text.trim();
+    final amount = double.parse(_amountController.text.trim());
+    final note = _noteController.text.trim().isEmpty ? null : _noteController.text.trim();
+
+    final Transaction result;
+
+    if (isEditing) {
+      // 3. Use copyWith to retain IDs/metadata while updating modified fields
+      result = widget.initialTransaction!.copyWith(
+        title: title,
+        transactionType: _type,
+        category: _category,
+        dateTime: _dateTime,
+        amount: amount,
+        note: note,
+      );
+    } else {
+      // Create new transaction instance
+      result = Transaction(
+        title: title,
+        transactionType: _type,
+        category: _category,
+        dateTime: _dateTime,
+        amount: amount,
+        note: note,
+      );
+    }
+
+    Navigator.of(context).pop(result);
   }
 
   @override
@@ -129,7 +173,7 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
                   ),
                   SizedBox(height: 18.h),
                   Text(
-                    'Add transaction',
+                    isEditing ? "Edit Transaction" : "Add Transaction",
                     style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.w700, color: Colors.black87),
                   ),
                   SizedBox(height: 20.h),
@@ -269,7 +313,30 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
                       ),
                       child: Text(
-                        'Save transaction',
+                        isEditing ? 'update Transaction' : 'Save transaction',
+                        style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ),
+
+                  SizedBox(height: 15.h,),
+
+                  //cancel button
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: (){
+                        Navigator.of(context).pop();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: Colors.black,
+                        padding: EdgeInsets.symmetric(vertical: 16.h),
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r), side: BorderSide(color: _accent)),
+                      ),
+                      child: Text(
+                        'Cancel',
                         style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600),
                       ),
                     ),

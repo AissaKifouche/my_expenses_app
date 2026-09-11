@@ -30,6 +30,15 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  void editTransaction(Transaction updated){
+    setState(() {
+      final index = transactions.indexWhere((transaction) => transaction.id == updated.id);
+      if(index != -1){
+        transactions[index] = updated;
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final statusBarHeight = MediaQuery.of(context).padding.top ;
@@ -151,7 +160,7 @@ class _HomePageState extends State<HomePage> {
                               ...transactions.map((transaction) {
                                 return Padding(
                                   padding: EdgeInsets.only(bottom: 15.h),
-                                  child: TransactionCard(transaction: transaction, onDelete: deleteTransaction,),
+                                  child: TransactionCard(transaction: transaction, onDelete: deleteTransaction, onUpdate: editTransaction,),
                                 );
                               }),
                           ],

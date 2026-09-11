@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:my_expenses/models/transaction.dart'; // adjust path to your model file
+import 'package:my_expenses/models/transaction.dart';
+import 'package:my_expenses/screens/add_transaction_sheet.dart'; // adjust path to your model file
 
 
 class TransactionDetailPage extends StatelessWidget {
   final Transaction transaction;
   final Function(String) onDelete;
+  final Function(Transaction) onUpdate;
 
-  const TransactionDetailPage({super.key, required this.transaction, required this.onDelete});
+  const TransactionDetailPage({super.key, required this.transaction, required this.onDelete, required this.onUpdate});
 
   static const _teal = Color(0xFF058E84);
   static const _tealDark = Color(0xFF06655E);
@@ -91,8 +93,23 @@ class TransactionDetailPage extends StatelessWidget {
                       children: [
                         Expanded(
                           child: OutlinedButton.icon(
-                            onPressed: () {
-                              // TODO: hook up edit flow
+                            onPressed: () async {
+                              final updated = await showModalBottomSheet<Transaction>(
+                                useSafeArea: true,
+                                isScrollControlled: true,
+                                context: context,
+                                constraints: BoxConstraints(
+                                  maxHeight: MediaQuery.of(context).size.height * 0.7,
+                                ),
+                                builder: (context) {
+                                  return AddTransactionSheet(initialTransaction: transaction,);
+                                }
+                              );
+
+                              if (updated != null){
+                                onUpdate(updated);
+                                Navigator.of(context).pop();
+                              }
                             },
                             icon: const Icon(Icons.edit_outlined, size: 18),
                             label: const Text('Edit'),
