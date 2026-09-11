@@ -4,18 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:my_expenses/models/transaction.dart';
 import 'package:my_expenses/screens/transaction_details.dart';
 
-Future<Transaction?> showAddTransactionSheet(BuildContext context) {
-  return showModalBottomSheet<Transaction>(
-    context: context,
-    isScrollControlled: true,
-    backgroundColor: Colors.transparent,
-    // Allows the modal bottom sheet to extend up to 90% of screen height
-    constraints: BoxConstraints(
-      maxHeight: MediaQuery.of(context).size.height * 0.9,
-    ),
-    builder: (_) => const AddTransactionSheet(),
-  );
-}
+
 
 class AddTransactionSheet extends StatefulWidget {
   const AddTransactionSheet({super.key});
