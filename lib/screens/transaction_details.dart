@@ -6,8 +6,9 @@ import 'package:my_expenses/models/transaction.dart'; // adjust path to your mod
 
 class TransactionDetailPage extends StatelessWidget {
   final Transaction transaction;
+  final Function(String) onDelete;
 
-  const TransactionDetailPage({super.key, required this.transaction});
+  const TransactionDetailPage({super.key, required this.transaction, required this.onDelete});
 
   static const _teal = Color(0xFF058E84);
   static const _tealDark = Color(0xFF06655E);
@@ -107,7 +108,8 @@ class TransactionDetailPage extends StatelessWidget {
                         Expanded(
                           child: ElevatedButton.icon(
                             onPressed: () {
-                              // TODO: hook up delete flow
+                              onDelete(transaction.id);
+                              Navigator.of(context).pop();
                             },
                             icon: const Icon(Icons.delete_outline_rounded, size: 18),
                             label: const Text('Delete'),

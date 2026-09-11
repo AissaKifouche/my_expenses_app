@@ -4,24 +4,20 @@ import 'package:my_expenses/models/transaction.dart';
 import 'package:flutter_utils/flutter_utils.dart';
 import 'package:my_expenses/screens/transaction_details.dart';
 
-class TransactionCard extends StatefulWidget {
+class TransactionCard extends StatelessWidget {
   final Transaction transaction;
-  const TransactionCard({super.key, required this.transaction});
+  final Function(String) onDelete;
+  const TransactionCard({super.key, required this.transaction, required this.onDelete});
 
-  @override
-  State<TransactionCard> createState() => _TransactionCardState();
-}
-
-class _TransactionCardState extends State<TransactionCard> {
   @override
   Widget build(BuildContext context) {
     return InkWell(
       borderRadius: BorderRadius.circular(15.r),
       onTap: (){
         Navigator.push(
-            context, 
+            context,
             MaterialPageRoute(
-              builder: (context) => TransactionDetailPage(transaction: widget.transaction),
+              builder: (context) => TransactionDetailPage(transaction: transaction, onDelete: onDelete,),
             )
         );
       },
@@ -39,7 +35,7 @@ class _TransactionCardState extends State<TransactionCard> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  widget.transaction.title,
+                  transaction.title,
                   style: TextStyle(
                     fontSize: 18.sp,
                     color: Colors.black,
@@ -49,7 +45,7 @@ class _TransactionCardState extends State<TransactionCard> {
                 SizedBox(height: 6.h,),
 
                 Text(
-                  Times.formatRelativeDate(widget.transaction.dateTime),
+                  Times.formatRelativeDate(transaction.dateTime),
                   style: TextStyle(
                     fontSize: 14.sp,
                     color: Colors.grey[800],
@@ -59,10 +55,10 @@ class _TransactionCardState extends State<TransactionCard> {
             ),
 
             Text(
-              ( widget.transaction.transactionType == TransactionType.expense ) ? "-\$ ${widget.transaction.amount}" : "+\$ ${widget.transaction.amount}",
+              ( transaction.transactionType == TransactionType.expense ) ? "-\$ ${transaction.amount}" : "+\$ ${transaction.amount}",
               style: TextStyle(
                 fontSize: 20.sp,
-                color: ( widget.transaction.transactionType == TransactionType.expense ) ? Colors.redAccent : Colors.greenAccent,
+                color: ( transaction.transactionType == TransactionType.expense ) ? Colors.redAccent : Colors.greenAccent,
                 fontWeight: FontWeight.w500
               ),
             )

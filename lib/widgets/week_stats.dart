@@ -52,7 +52,7 @@ class _WeekStatsState extends State<WeekStats> {
         ),
 
         SizedBox(height: 25.h,),
-
+/*
         TransactionCard(transaction: transactions[0],),
         SizedBox(height: 15.h,),
         TransactionCard(transaction: transactions[1],),
@@ -72,7 +72,7 @@ class _WeekStatsState extends State<WeekStats> {
         TransactionCard(transaction: transactions[8],),
         SizedBox(height: 15.h,),
         TransactionCard(transaction: transactions[09],),
-        SizedBox(height: 15.h,),
+        SizedBox(height: 15.h,),*/
 
 
       ],

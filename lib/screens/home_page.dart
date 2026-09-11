@@ -24,6 +24,12 @@ class _HomePageState extends State<HomePage> {
     Transaction(title: "title", transactionType: TransactionType.income, category: Category.salary, dateTime: DateTime.now(), amount: 85),
   ];
 
+  void deleteTransaction(String id){
+    setState(() {
+      transactions.removeWhere((transaction) => transaction.id == id);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final statusBarHeight = MediaQuery.of(context).padding.top ;
@@ -145,7 +151,7 @@ class _HomePageState extends State<HomePage> {
                               ...transactions.map((transaction) {
                                 return Padding(
                                   padding: EdgeInsets.only(bottom: 15.h),
-                                  child: TransactionCard(transaction: transaction),
+                                  child: TransactionCard(transaction: transaction, onDelete: deleteTransaction,),
                                 );
                               }),
                           ],
