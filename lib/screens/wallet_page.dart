@@ -1,15 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:my_expenses/data/app_data.dart';
+import 'package:my_expenses/models/wallet.dart';
 import 'package:my_expenses/widgets/goal_card.dart';
 
 class WalletPage extends StatefulWidget {
-  const WalletPage({super.key});
+  final AppData appData;
+  const WalletPage({super.key, required this.appData});
 
   @override
   State<WalletPage> createState() => _WalletPageState();
 }
 
 class _WalletPageState extends State<WalletPage> {
+
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,14 +41,14 @@ class _WalletPageState extends State<WalletPage> {
                 padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  color: Color(0xFF296D68),
+                  color: widget.appData.wallet.balance >= 0 ? Color(0xFF296D68) : Colors.red,
                   borderRadius: BorderRadius.circular(20.r)
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
-                      "You Have",
+                      widget.appData.wallet.name,
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 26.sp,
@@ -52,7 +58,7 @@ class _WalletPageState extends State<WalletPage> {
                     SizedBox(height: 30.h,),
 
                     Text(
-                      "\$ 30 562.24",
+                      "\$ ${widget.appData.wallet.balance}",
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 34.sp,

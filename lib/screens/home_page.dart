@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:my_expenses/buttom_clipper.dart';
+import 'package:my_expenses/data/app_data.dart';
 import 'package:my_expenses/models/transaction.dart';
 import 'package:my_expenses/screens/add_transaction_sheet.dart';
 import 'package:my_expenses/widgets/budget_card.dart';
@@ -9,8 +10,9 @@ import 'package:my_expenses/widgets/transaction_card.dart';
 
 
 class HomePage extends StatefulWidget {
+  final AppData appData;
   final void Function(int) onNavigateToTab;
-  const HomePage({super.key, required this.onNavigateToTab});
+  const HomePage({super.key, required this.onNavigateToTab, required this.appData});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -18,26 +20,10 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
 
-  final List<Transaction> transactions = [
-    Transaction(title: "title", transactionType: TransactionType.expense, category: Category.bills, dateTime: DateTime.now(), amount: 85),
-    Transaction(title: "title", transactionType: TransactionType.expense, category: Category.bills, dateTime: DateTime.now(), amount: 85),
-    Transaction(title: "title", transactionType: TransactionType.income, category: Category.salary, dateTime: DateTime.now(), amount: 85),
-  ];
 
-  void deleteTransaction(String id){
-    setState(() {
-      transactions.removeWhere((transaction) => transaction.id == id);
-    });
-  }
+  
 
-  void editTransaction(Transaction updated){
-    setState(() {
-      final index = transactions.indexWhere((transaction) => transaction.id == updated.id);
-      if(index != -1){
-        transactions[index] = updated;
-      }
-    });
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +50,7 @@ class _HomePageState extends State<HomePage> {
 
             if(newTransaction != null){
               setState(() {
-                transactions.insert(0, newTransaction);
+                widget.appData.addTransaction(newTransaction);
               });
             }
           },
@@ -152,15 +138,27 @@ class _HomePageState extends State<HomePage> {
                             SizedBox(height: 25.h,),
 
                             //recent transactions
-                            if (transactions.isEmpty)
+                            if (widget.appData.transactions.isEmpty)
                               Text(
-                                'No transaction at the moment',
+                                'No transactions at the moment',
                               )
                             else
-                              ...transactions.map((transaction) {
+                              ...widget.appData.transactions.map((transaction) {
                                 return Padding(
                                   padding: EdgeInsets.only(bottom: 15.h),
-                                  child: TransactionCard(transaction: transaction, onDelete: deleteTransaction, onUpdate: editTransaction,),
+                                  child: TransactionCard(
+                                    transaction: transaction, 
+                                    onDelete: (id){
+                                      setState(() {
+                                        widget.appData.deleteTransaction(id);
+                                      });
+                                    }, 
+                                    onUpdate: (updated){
+                                      setState(() {
+                                        widget.appData.editTransaction(updated);
+                                      });
+                                    },
+                                  ),
                                 );
                               }),
                           ],

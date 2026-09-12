@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:my_expenses/data/app_data.dart';
 import 'package:my_expenses/screens/home_page.dart';
 import 'package:my_expenses/screens/settings_page.dart';
 import 'package:my_expenses/screens/stats_page.dart';
@@ -15,6 +16,8 @@ class MainShell extends StatefulWidget {
 
 class _MainShellState extends State<MainShell> {
 
+  final AppData appData = AppData();
+
   int _selectedIndex = 0;
 
   void onItemTapped(int index){
@@ -29,9 +32,9 @@ class _MainShellState extends State<MainShell> {
       body: IndexedStack(
         index: _selectedIndex,
         children: [
-          HomePage(onNavigateToTab: onItemTapped,),
+          HomePage(onNavigateToTab: onItemTapped, appData: appData,),
           StatsPage(),
-          WalletPage(),
+          WalletPage(appData: appData,),
           SettingsPage(),
         ],
       ),
