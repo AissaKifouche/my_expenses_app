@@ -144,7 +144,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "5d1a20d4dd261df060657b090a1ac645c0759246"
+      resolved-ref: "1c3191b4013b4c88e8970e553692f014a87e730e"
       url: "https://github.com/AissaKifouche/flutter_utils.git"
     source: git
     version: "0.0.1"
@@ -274,7 +274,7 @@ packages:
     source: hosted
     version: "4.1.2"
   intl:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: intl
       sha256: "1ca20c894b1717686a2319b8548763d812bc0aabdac580420a44c5178c57a867"

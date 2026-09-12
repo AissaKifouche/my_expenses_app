@@ -173,7 +173,7 @@ class _HomePageState extends State<HomePage> {
                     right: 0.w,
                     child: Padding(
                       padding: EdgeInsets.symmetric(horizontal: 20),
-                      child: BudgetCard(),
+                      child: BudgetCard(appData: widget.appData,),
                     ),
                   ),
                 ],
