@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_utils/flutter_utils.dart';
 import 'package:my_expenses/data/app_data.dart';
 import 'package:my_expenses/models/monthly_budget.dart';
 import 'package:intl/intl.dart';
+import 'package:my_expenses/widgets/add_budget_window.dart';
 
 class BudgetCard extends StatefulWidget {
   final AppData appData;
@@ -104,7 +106,7 @@ class _BudgetCardState extends State<BudgetCard> {
 
             LinearProgressIndicator(
               value: (budget.spent / budget.amount).clamp(0, 1),
-              backgroundColor: Color(0xFF47B943),
+              backgroundColor: (budget.spent / budget.amount).clamp(0, 1) > 0.8 ? Color(0xFFFF0000) :  Color(0xFF47B943),
               color: Colors.white,
               minHeight: 10.h,
               borderRadius: BorderRadius.circular(20.r),
@@ -123,7 +125,7 @@ class _BudgetCardState extends State<BudgetCard> {
                   ),
                 ),
                 Text(
-                  "9 days left",
+                  "${Times.getRemainingDaysInMonth()} left",
                   style: TextStyle(
                       fontSize: 14.sp,
                       color: Colors.white
@@ -178,8 +180,13 @@ class _BudgetCardState extends State<BudgetCard> {
 
 
           InkWell(
-            onTap: (){
-
+            onTap: ()  async {
+              MonthlyBudget? b = await showSetBudgetDialog(context);
+              if (b != null){
+                setState(() {
+                  widget.appData.addBudget(b);
+                });
+              }
             },
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
