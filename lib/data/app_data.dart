@@ -25,7 +25,22 @@ class AppData {
   void editTransaction(Transaction updated){
     int index = transactions.indexWhere((transaction) => transaction.id == updated.id);
     if (index != -1){
+      Transaction oldTransaction = transactions[index];
+      double oldAmount = oldTransaction.amount;
+      double newAmount = updated.amount;
       transactions[index] = updated;
+      if(oldTransaction.transactionType == TransactionType.income && updated.transactionType == TransactionType.income){
+        wallet.balance += newAmount - oldAmount;
+      }
+      else if(oldTransaction.transactionType == TransactionType.expense && updated.transactionType == TransactionType.expense){
+        wallet.balance += oldAmount - newAmount;
+      }
+      else if(oldTransaction.transactionType == TransactionType.income && updated.transactionType == TransactionType.expense){
+        wallet.balance -= oldAmount + newAmount;
+      }
+      else {
+        wallet.balance += oldAmount + newAmount;
+      }
     }
   }
 
