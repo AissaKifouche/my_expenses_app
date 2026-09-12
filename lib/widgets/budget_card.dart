@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:my_expenses/data/app_data.dart';
+import 'package:my_expenses/models/monthly_budget.dart';
+import 'package:intl/intl.dart';
 
 class BudgetCard extends StatefulWidget {
-  const BudgetCard({super.key});
+  final AppData appData;
+  const BudgetCard({super.key, required this.appData});
 
   @override
   State<BudgetCard> createState() => _BudgetCardState();
@@ -10,24 +14,44 @@ class BudgetCard extends StatefulWidget {
 
 class _BudgetCardState extends State<BudgetCard> {
 
-  double budget = 3500;
-  double spent = 1562;
-  double get left => budget - spent;
+  final DateTime now = DateTime.now();
+
   @override
   Widget build(BuildContext context) {
+
+    MonthlyBudget? monthlyBudget;
+
+    int i = widget.appData.budgets.indexWhere((b) => b.year == now.year && b.month == now.month);
+    if( i == -1 ){
+
+    }
+    else{
+      monthlyBudget = widget.appData.budgets[i];
+    }
+
+
+
+
+    return (monthlyBudget == null)? noBudgetExist() : budgetExists(monthlyBudget);
+
+  }
+
+
+
+  Widget budgetExists(MonthlyBudget budget){
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20.r),
-        color: Color(0xFF296D68),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha(100),
-            blurRadius: 15.r,
-            offset: Offset(0, 8),
-            spreadRadius: 0,
-          ),
-        ]
+          borderRadius: BorderRadius.circular(20.r),
+          color: Color(0xFF296D68),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withAlpha(100),
+              blurRadius: 15.r,
+              offset: Offset(0, 8),
+              spreadRadius: 0,
+            ),
+          ]
       ),
       child: Padding(
         padding: EdgeInsets.symmetric( horizontal: 20.0.w, vertical: 20.h),
@@ -45,7 +69,7 @@ class _BudgetCardState extends State<BudgetCard> {
             SizedBox(height: 4.h,),
 
             Text(
-              " \$${spent.toStringAsFixed(2)}",
+              " \$${budget.spent.toStringAsFixed(2)}",
               style: TextStyle(
                 fontSize: 30.sp,
                 color: Colors.white,
@@ -59,7 +83,7 @@ class _BudgetCardState extends State<BudgetCard> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "Budget: \$${budget.toStringAsFixed(2)}",
+                  "Budget: \$${budget.amount.toStringAsFixed(2)}",
                   style: TextStyle(
                     fontSize: 14.sp,
                     color: Colors.white,
@@ -67,7 +91,7 @@ class _BudgetCardState extends State<BudgetCard> {
                 ),
 
                 Text(
-                  "Remaining: \$${left.toStringAsFixed(2)}",
+                  "Remaining: \$${budget.remaining.toStringAsFixed(2)}",
                   style: TextStyle(
                     fontSize: 14.sp,
                     color: Colors.white,
@@ -79,7 +103,7 @@ class _BudgetCardState extends State<BudgetCard> {
             SizedBox(height: 15.h,),
 
             LinearProgressIndicator(
-              value: (spent / budget).clamp(0, 1),
+              value: (budget.spent / budget.amount).clamp(0, 1),
               backgroundColor: Color(0xFF47B943),
               color: Colors.white,
               minHeight: 10.h,
@@ -92,10 +116,10 @@ class _BudgetCardState extends State<BudgetCard> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "${((spent / budget).clamp(0, 1) * 100).toStringAsFixed(2)}% used",
+                  "${((budget.spent / budget.amount).clamp(0, 1) * 100).toStringAsFixed(2)}% used",
                   style: TextStyle(
-                    fontSize: 14.sp,
-                    color: Colors.white
+                      fontSize: 14.sp,
+                      color: Colors.white
                   ),
                 ),
                 Text(
@@ -112,4 +136,73 @@ class _BudgetCardState extends State<BudgetCard> {
       ),
     );
   }
+
+  Widget noBudgetExist(){
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20.r),
+        color: Color(0xFF296D68),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(100),
+            blurRadius: 15.r,
+            offset: Offset(0, 8),
+            spreadRadius: 0,
+          ),
+        ]
+      ),
+      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 40.h),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            DateFormat("MMMM yyyy").format(now),
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 20.sp
+            ),
+          ),
+
+          SizedBox(height: 20.h,),
+
+          Text(
+            "No budget set",
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 20.sp
+            ),
+          ),
+
+          SizedBox(height: 20.h,),
+
+
+          InkWell(
+            onTap: (){
+
+            },
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+
+                Icon(Icons.add, color: Colors.white,),
+
+                SizedBox(width: 10.w,),
+
+                Text(
+                  "Set monthly budget",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 22.sp,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
 }
