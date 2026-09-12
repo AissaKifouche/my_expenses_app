@@ -17,4 +17,12 @@ class MonthlyBudget {
 }): id = Uuid().v4();
 
   double get remaining => amount - spent;
+
+  void addExpense(double amount){
+    spent += amount;
+  }
+
+  void deleteExpense(double amount){
+    spent -= amount;
+  }
 }
