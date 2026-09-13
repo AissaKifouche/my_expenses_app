@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:my_expenses/data/app_data.dart';
+import 'package:my_expenses/models/goal.dart';
 import 'package:my_expenses/models/wallet.dart';
+import 'package:my_expenses/screens/add_goal_sheet.dart';
 import 'package:my_expenses/widgets/goal_card.dart';
 
 class WalletPage extends StatefulWidget {
@@ -19,6 +21,38 @@ class _WalletPageState extends State<WalletPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () async {
+          final newGoal = await showModalBottomSheet<Goal>(
+            useSafeArea: true,
+            isScrollControlled: true,
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.7,
+            ),
+            context: context,
+            builder: (context) {
+              return AddGoalSheet();
+            }
+          );
+
+          if(newGoal != null){
+            setState(() {
+              widget.appData.addGoal(newGoal);
+            });
+          }
+        },
+        backgroundColor: Color(0xFF2F948D),
+        label: Text(
+          "Add a goal",
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 18.sp
+          ),
+        ),
+        icon: Icon(Icons.add, color: Colors.white, size: 40.h,),
+      ),
+
       appBar: AppBar(
         backgroundColor: Color(0xFF219289),
         title: Text(
