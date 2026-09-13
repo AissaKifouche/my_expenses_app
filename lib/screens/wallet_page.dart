@@ -83,7 +83,17 @@ class _WalletPageState extends State<WalletPage> {
 
               SizedBox(height: 30.h,),
 
-              GoalCard(),
+              if (widget.appData.goals.isEmpty)
+                Text(
+                  "No goals at the moment",
+                )
+              else
+                ...widget.appData.goals.map((goal) {
+                  return GoalCard(
+                    goal: goal,
+                  );
+                }),
+
             ],
           ),
         ),
