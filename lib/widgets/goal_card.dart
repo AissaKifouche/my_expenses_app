@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../models/goal.dart';
+
 class GoalCard extends StatefulWidget {
-  const GoalCard({super.key});
+  final Goal goal;
+  const GoalCard({super.key, required this.goal});
 
   @override
   State<GoalCard> createState() => _GoalCardState();
@@ -45,6 +48,33 @@ class _GoalCardState extends State<GoalCard> {
     );
   }
 
+
+  Widget uncompletedLinearProgress(Goal goal){
+    Color color;
+
+    if ( goal.savedAmount >= 6/7 * goal.targetedAmount ){
+      color = Color(0xFF002017);
+    } else if (goal.savedAmount >= 5/7 * goal.targetedAmount){
+      color = Color(0xFF004231);
+    } else if (goal.savedAmount >= 4/7 * goal.targetedAmount){
+      color = Color(0xFF00674F);
+    } else if (goal.savedAmount >= 3/7 * goal.targetedAmount){
+      color = Color(0xFF008F6F);
+    } else if (goal.savedAmount >= 2/7 * goal.targetedAmount){
+      color = Color(0xFF00B890);
+    } else if (goal.savedAmount >= 1/7 * goal.targetedAmount){
+      color = Color(0xFF00E4B2);
+    } else {
+      color = Color(0xFFBAFFE5);
+    }
+
+    return LinearProgressIndicator(
+      value: goal.savedAmount / goal.targetedAmount,
+      backgroundColor: Color(0xFFD9D9D9),
+      color: color,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -63,7 +93,7 @@ class _GoalCardState extends State<GoalCard> {
             Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                "Car",
+                widget.goal.title,
                 style: TextStyle(
                   fontSize: 20.sp,
                   color: Colors.black,
@@ -77,17 +107,19 @@ class _GoalCardState extends State<GoalCard> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "\$ 30000",
+                  "\$ ${widget.goal.savedAmount}",
                 ),
                 Text(
-                  "\$ 30000",
+                  "\$ ${widget.goal.targetedAmount}",
                 ),
               ],
             ),
 
             SizedBox(height: 10.h,),
 
-            completeLinearProgress(),
+
+            widget.goal.savedAmount / widget.goal.targetedAmount >= 1 ? completeLinearProgress() : uncompletedLinearProgress(widget.goal),
+
           ],
         ),
       ),
