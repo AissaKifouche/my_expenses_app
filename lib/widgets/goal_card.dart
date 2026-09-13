@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:my_expenses/screens/goal_details.dart';
 
 import '../models/goal.dart';
 
@@ -80,7 +81,12 @@ class _GoalCardState extends State<GoalCard> {
     return InkWell(
       borderRadius: BorderRadius.circular(20.r),
       onTap: (){
-        //TBD
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => GoalDetailPage(goal: widget.goal),
+          ),
+        );
       },
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 15.h),
