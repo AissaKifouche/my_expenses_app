@@ -74,4 +74,41 @@ class AppData {
     goals.add(goal);
   }
 
+
+  bool addMoneyToGoal(String goalId, double amount){
+    if (wallet.balance < amount) {
+      return false;
+    }
+
+    final goal = goals.firstWhere((g) => g.id == goalId);
+    wallet.balance -= amount;
+    goal.savedAmount += amount;
+
+    return true;
+  }
+
+  bool removeMoneyFromGoal(String goalId, double amount){
+    final goal = goals.firstWhere((g) => g.id == goalId);
+    if (goal.savedAmount < amount ){
+      return false;
+    }
+
+    goal.savedAmount -= amount;
+    wallet.balance += amount;
+    return true;
+  }
+
+  void deleteGoal(String id){
+    int i = goals.indexWhere((test) => test.id == id);
+    wallet.balance += goals[i].savedAmount;
+    goals.removeAt(i);
+  }
+
+  void editGoal(Goal updated){
+    int i = goals.indexWhere((test) => test.id == updated.id);
+    if(i != -1){
+      goals[i] = updated;
+    }
+  }
+
 }

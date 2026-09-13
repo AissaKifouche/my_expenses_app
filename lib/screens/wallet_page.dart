@@ -125,6 +125,7 @@ class _WalletPageState extends State<WalletPage> {
                 ...widget.appData.goals.map((goal) {
                   return GoalCard(
                     goal: goal,
+                    appData: widget.appData,
                   );
                 }),
 

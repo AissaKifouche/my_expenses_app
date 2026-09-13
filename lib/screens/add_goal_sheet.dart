@@ -6,7 +6,8 @@ import '../models/goal.dart';
 
 
 class AddGoalSheet extends StatefulWidget {
-  const AddGoalSheet({super.key});
+  final Goal? initialGoal;
+  const AddGoalSheet({super.key, this.initialGoal});
 
   @override
   State<AddGoalSheet> createState() => _AddGoalSheetState();
@@ -16,8 +17,19 @@ class _AddGoalSheetState extends State<AddGoalSheet> {
   static const _accent = Color(0xFF058E84);
 
   final _formKey = GlobalKey<FormState>();
-  final _titleController = TextEditingController();
-  final _targetController = TextEditingController();
+  late TextEditingController _titleController ;
+  late TextEditingController _targetController ;
+
+  bool get isEditing => widget.initialGoal != null;
+
+  @override
+  void initState() {
+    super.initState();
+    final g = widget.initialGoal;
+
+    _titleController = TextEditingController(text: g?.title ?? "");
+    _targetController = TextEditingController(text: g?.targetedAmount.toStringAsFixed(2) ?? "" );
+  }
 
   @override
   void dispose() {
@@ -28,10 +40,21 @@ class _AddGoalSheetState extends State<AddGoalSheet> {
 
   void _save() {
     if (!_formKey.currentState!.validate()) return;
-    final goal = Goal(
-      title: _titleController.text.trim(),
-      targetedAmount: double.parse(_targetController.text.trim()),
-    );
+
+    final Goal goal;
+
+    if (isEditing){
+      goal = widget.initialGoal!.copyWith(
+        title: _titleController.text.trim(),
+        targetedAmount: double.tryParse(_targetController.text.trim()),
+      );
+    }
+    else {
+      goal = Goal(
+        title: _titleController.text.trim(),
+        targetedAmount: double.parse(_targetController.text.trim()),
+      );
+    }
     Navigator.of(context).pop(goal);
   }
 
@@ -71,7 +94,7 @@ class _AddGoalSheetState extends State<AddGoalSheet> {
                   ),
                   SizedBox(height: 18.h),
                   Text(
-                    'Add a goal',
+                    isEditing ? 'Edit goal' : 'Add a goal',
                     style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.w700, color: Colors.black87),
                   ),
                   SizedBox(height: 22.h),
@@ -115,7 +138,7 @@ class _AddGoalSheetState extends State<AddGoalSheet> {
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
                       ),
                       child: Text(
-                        'Save goal',
+                        isEditing? 'Update goal' : 'Save goal',
                         style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600),
                       ),
                     ),

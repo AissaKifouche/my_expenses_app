@@ -1,23 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:my_expenses/data/app_data.dart';
+import 'package:my_expenses/screens/add_goal_sheet.dart';
+import 'package:my_expenses/widgets/goal_add_and_remove_money.dart';
 import '../models/goal.dart';
 
-class GoalDetailPage extends StatelessWidget {
+class GoalDetailPage extends StatefulWidget {
+  final AppData appData;
   final Goal goal;
 
-  const GoalDetailPage({super.key, required this.goal});
+  const GoalDetailPage({super.key, required this.appData, required this.goal});
 
   static const _accent = Color(0xFF058E84);
 
-  bool get _isComplete => goal.savedAmount / goal.targetedAmount >= 1;
+  @override
+  State<GoalDetailPage> createState() => _GoalDetailPageState();
+}
+
+class _GoalDetailPageState extends State<GoalDetailPage> {
+  bool get _isComplete => widget.goal.savedAmount / widget.goal.targetedAmount >= 1;
 
   Color _progressColor() {
-    if (goal.savedAmount >= 6 / 7 * goal.targetedAmount) return const Color(0xFF002017);
-    if (goal.savedAmount >= 5 / 7 * goal.targetedAmount) return const Color(0xFF004231);
-    if (goal.savedAmount >= 4 / 7 * goal.targetedAmount) return const Color(0xFF00674F);
-    if (goal.savedAmount >= 3 / 7 * goal.targetedAmount) return const Color(0xFF008F6F);
-    if (goal.savedAmount >= 2 / 7 * goal.targetedAmount) return const Color(0xFF00B890);
-    if (goal.savedAmount >= 1 / 7 * goal.targetedAmount) return const Color(0xFF00E4B2);
+    if (widget.goal.savedAmount >= 6 / 7 * widget.goal.targetedAmount) return const Color(0xFF002017);
+    if (widget.goal.savedAmount >= 5 / 7 * widget.goal.targetedAmount) return const Color(0xFF004231);
+    if (widget.goal.savedAmount >= 4 / 7 * widget.goal.targetedAmount) return const Color(0xFF00674F);
+    if (widget.goal.savedAmount >= 3 / 7 * widget.goal.targetedAmount) return const Color(0xFF008F6F);
+    if (widget.goal.savedAmount >= 2 / 7 * widget.goal.targetedAmount) return const Color(0xFF00B890);
+    if (widget.goal.savedAmount >= 1 / 7 * widget.goal.targetedAmount) return const Color(0xFF00E4B2);
     return const Color(0xFFBAFFE5);
   }
 
@@ -32,7 +41,7 @@ class GoalDetailPage extends StatelessWidget {
               width: double.infinity,
               padding: EdgeInsets.fromLTRB(20.w, MediaQuery.of(context).padding.top + 12.h, 20.w, 36.h),
               decoration: BoxDecoration(
-                color: _accent,
+                color: GoalDetailPage._accent,
                 borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(32.r),
                   bottomRight: Radius.circular(32.r),
@@ -60,12 +69,12 @@ class GoalDetailPage extends StatelessWidget {
                   ),
                   SizedBox(height: 28.h),
                   Text(
-                    goal.title,
+                    widget.goal.title,
                     style: TextStyle(color: Colors.white, fontSize: 22.sp, fontWeight: FontWeight.w600),
                   ),
                   SizedBox(height: 6.h),
                   Text(
-                    '\$${goal.savedAmount.toStringAsFixed(2)} of \$${goal.targetedAmount.toStringAsFixed(2)}',
+                    '\$${widget.goal.savedAmount.toStringAsFixed(2)} of \$${widget.goal.targetedAmount.toStringAsFixed(2)}',
                     style: TextStyle(color: Colors.white70, fontSize: 15.sp),
                   ),
                 ],
@@ -84,7 +93,7 @@ class GoalDetailPage extends StatelessWidget {
                     child: _isComplete
                         ? Container(height: 14.h, color: const Color(0xFF00E4B2))
                         : LinearProgressIndicator(
-                      value: goal.savedAmount / goal.targetedAmount,
+                      value: widget.goal.savedAmount / widget.goal.targetedAmount,
                       minHeight: 14.h,
                       backgroundColor: const Color(0xFFD9D9D9),
                       color: _progressColor(),
@@ -94,7 +103,7 @@ class GoalDetailPage extends StatelessWidget {
                   Text(
                     _isComplete
                         ? 'Goal completed 🎉'
-                        : '${((goal.savedAmount / goal.targetedAmount) * 100).clamp(0, 100).toStringAsFixed(0)}% saved',
+                        : '${((widget.goal.savedAmount / widget.goal.targetedAmount) * 100).clamp(0, 100).toStringAsFixed(0)}% saved',
                     style: TextStyle(fontSize: 13.sp, color: Colors.black54),
                   ),
                   SizedBox(height: 24.h),
@@ -109,11 +118,11 @@ class GoalDetailPage extends StatelessWidget {
                     ),
                     child: Column(
                       children: [
-                        _DetailRow(label: 'Saved', value: '\$${goal.savedAmount.toStringAsFixed(2)}'),
+                        _DetailRow(label: 'Saved', value: '\$${widget.goal.savedAmount.toStringAsFixed(2)}'),
                         const Divider(height: 1, color: Color(0xFFE8E8E8)),
-                        _DetailRow(label: 'Target', value: '\$${goal.targetedAmount.toStringAsFixed(2)}'),
+                        _DetailRow(label: 'Target', value: '\$${widget.goal.targetedAmount.toStringAsFixed(2)}'),
                         const Divider(height: 1, color: Color(0xFFE8E8E8)),
-                        _DetailRow(label: 'Remaining', value: '\$${goal.remaining.toStringAsFixed(2)}'),
+                        _DetailRow(label: 'Remaining', value: '\$${widget.goal.remaining.toStringAsFixed(2)}'),
                       ],
                     ),
                   ),
@@ -122,15 +131,20 @@ class GoalDetailPage extends StatelessWidget {
                   // add / remove money
                   Row(
                     children: [
+
+                      //add money to the goal from the main wallet
                       Expanded(
                         child: ElevatedButton.icon(
-                          onPressed: () {
-                            // TODO: hook up add money flow
+                          onPressed: () async {
+                            double? amount = await showAddOrRemoveDialog(context, widget.appData, true, widget.goal);
+                            if (amount != null){
+                              widget.appData.addMoneyToGoal(widget.goal.id, amount);
+                            }
                           },
                           icon: const Icon(Icons.add_rounded, size: 18),
                           label: const Text('Add money'),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: _accent,
+                            backgroundColor: GoalDetailPage._accent,
                             foregroundColor: Colors.white,
                             elevation: 0,
                             padding: EdgeInsets.symmetric(vertical: 14.h),
@@ -139,16 +153,21 @@ class GoalDetailPage extends StatelessWidget {
                         ),
                       ),
                       SizedBox(width: 12.w),
+
+                      //remove money from the goal and put them back in the main wallet
                       Expanded(
                         child: OutlinedButton.icon(
-                          onPressed: () {
-                            // TODO: hook up remove money flow
+                          onPressed: () async {
+                            double? amount = await showAddOrRemoveDialog(context, widget.appData, false, widget.goal);
+                            if (amount != null){
+                              widget.appData.removeMoneyFromGoal(widget.goal.id, amount);
+                            }
                           },
                           icon: const Icon(Icons.remove_rounded, size: 18),
                           label: const Text('Remove money'),
                           style: OutlinedButton.styleFrom(
-                            foregroundColor: _accent,
-                            side: BorderSide(color: _accent.withValues(alpha: 0.4)),
+                            foregroundColor: GoalDetailPage._accent,
+                            side: BorderSide(color: GoalDetailPage._accent.withValues(alpha: 0.4)),
                             padding: EdgeInsets.symmetric(vertical: 14.h),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
                           ),
@@ -161,10 +180,27 @@ class GoalDetailPage extends StatelessWidget {
                   // edit / delete
                   Row(
                     children: [
+
+                      //to edit a goal
                       Expanded(
                         child: OutlinedButton.icon(
-                          onPressed: () {
-                            // TODO: hook up edit flow
+                          onPressed: () async {
+                            final updated = await showModalBottomSheet(
+                              useSafeArea: true,
+                              isScrollControlled: true,
+                              context: context,
+                              constraints: BoxConstraints(
+                                maxHeight: MediaQuery.of(context).size.height * 0.7,
+                              ),
+                              builder: (context) {
+                                return AddGoalSheet(initialGoal: widget.goal,);
+                              }
+                            );
+
+                            if(updated != null){
+                              widget.appData.editGoal(updated);
+                              Navigator.of(context).pop();
+                            }
                           },
                           icon: const Icon(Icons.edit_outlined, size: 18),
                           label: const Text('Edit'),
@@ -177,10 +213,12 @@ class GoalDetailPage extends StatelessWidget {
                         ),
                       ),
                       SizedBox(width: 12.w),
+
+                      //to delete a goal
                       Expanded(
                         child: ElevatedButton.icon(
                           onPressed: () {
-                            // TODO: hook up delete flow
+                            widget.appData.deleteGoal(widget.goal.id);
                           },
                           icon: const Icon(Icons.delete_outline_rounded, size: 18),
                           label: const Text('Delete'),

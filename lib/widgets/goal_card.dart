@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:my_expenses/data/app_data.dart';
 import 'package:my_expenses/screens/goal_details.dart';
 
 import '../models/goal.dart';
 
 class GoalCard extends StatefulWidget {
+  final AppData appData;
   final Goal goal;
-  const GoalCard({super.key, required this.goal});
+  const GoalCard({super.key, required this.appData, required this.goal});
 
   @override
   State<GoalCard> createState() => _GoalCardState();
@@ -23,7 +25,7 @@ class _GoalCardState extends State<GoalCard> {
         // Outer ambient aura - lower opacity and lighter green
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF80FFB3).withOpacity(0.35),
+            color: const Color(0xFF80FFB3).withValues(alpha: 0.35),
             blurRadius: 10,
             spreadRadius: 1,
           ),
@@ -34,7 +36,7 @@ class _GoalCardState extends State<GoalCard> {
           borderRadius: BorderRadius.circular(6),
           // Inner glowing edge illusion - subtle mint border
           border: Border.all(
-            color: const Color(0xFF80FFB3).withOpacity(0.5),
+            color: const Color(0xFF80FFB3).withValues(alpha: 0.5),
             width: 1.0,
           ),
           gradient: const RadialGradient(
@@ -84,7 +86,7 @@ class _GoalCardState extends State<GoalCard> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => GoalDetailPage(goal: widget.goal),
+            builder: (context) => GoalDetailPage(goal: widget.goal, appData: widget.appData,),
           ),
         );
       },
