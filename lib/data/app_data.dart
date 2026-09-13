@@ -1,3 +1,4 @@
+import 'package:my_expenses/models/goal.dart';
 import 'package:my_expenses/models/monthly_budget.dart';
 import 'package:my_expenses/models/transaction.dart';
 import 'package:my_expenses/models/wallet.dart';
@@ -10,6 +11,9 @@ class AppData {
 
   List<Transaction> transactions = [];
   List<MonthlyBudget> budgets = [];
+  List<Goal> goals = [];
+
+
 
   void addTransaction(Transaction transaction){
     transactions.insert(0, transaction);
@@ -59,8 +63,15 @@ class AppData {
   }
 
 
+  //add a monthly budget to the list
   void addBudget(MonthlyBudget budget){
     budgets.add(budget);
+  }
+
+
+  //add a goal to the list
+  void addGoal(Goal goal){
+    goals.add(goal);
   }
 
 }
