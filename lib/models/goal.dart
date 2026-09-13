@@ -14,4 +14,25 @@ class Goal {
 
   double get remaining => targetedAmount - savedAmount;
   double get progress => savedAmount / targetedAmount;
+
+
+  Goal._({
+    required this.id,
+    required this.title,
+    required this.targetedAmount,
+    required this.savedAmount ,
+});
+
+  Goal copyWith({
+    String? title,
+    double? targetedAmount,
+}){
+    return Goal._(
+      id: id,
+      title: title ?? this.title,
+      targetedAmount: targetedAmount ?? this.targetedAmount,
+      savedAmount: savedAmount,
+    );
+  }
+
 }
