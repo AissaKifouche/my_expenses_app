@@ -163,4 +163,20 @@ class AppData {
     ).fold(0, (sum, transaction) => sum + transaction.amount);
   }
 
+  //to get expenses by category
+  Map<Category, double> getMonthlyExpensesByCategory(int year, int month){
+    final result = <Category, double>{};
+
+    for(final transaction in transactions){
+      if( transaction.transactionType == TransactionType.expense &&
+          transaction.dateTime.year == year &&
+          transaction.dateTime.month == month
+      ){
+        result[transaction.category] = (result[transaction.category] ?? 0) + transaction.amount;
+      }
+    }
+
+    return result;
+  }
+
 }
