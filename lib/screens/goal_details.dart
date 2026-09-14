@@ -138,7 +138,9 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                           onPressed: () async {
                             double? amount = await showAddOrRemoveDialog(context, widget.appData, true, widget.goal);
                             if (amount != null){
-                              widget.appData.addMoneyToGoal(widget.goal.id, amount);
+                              setState(() {
+                                widget.appData.addMoneyToGoal(widget.goal.id, amount);
+                              });
                             }
                           },
                           icon: const Icon(Icons.add_rounded, size: 18),
@@ -160,7 +162,9 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                           onPressed: () async {
                             double? amount = await showAddOrRemoveDialog(context, widget.appData, false, widget.goal);
                             if (amount != null){
-                              widget.appData.removeMoneyFromGoal(widget.goal.id, amount);
+                              setState(() {
+                                widget.appData.removeMoneyFromGoal(widget.goal.id, amount);
+                              });
                             }
                           },
                           icon: const Icon(Icons.remove_rounded, size: 18),
@@ -198,7 +202,9 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                             );
 
                             if(updated != null){
-                              widget.appData.editGoal(updated);
+                              setState(() {
+                                widget.appData.editGoal(updated);
+                              });
                               Navigator.of(context).pop();
                             }
                           },
@@ -218,7 +224,9 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                       Expanded(
                         child: ElevatedButton.icon(
                           onPressed: () {
-                            widget.appData.deleteGoal(widget.goal.id);
+                            setState(() {
+                              widget.appData.deleteGoal(widget.goal.id);
+                            });
                           },
                           icon: const Icon(Icons.delete_outline_rounded, size: 18),
                           label: const Text('Delete'),

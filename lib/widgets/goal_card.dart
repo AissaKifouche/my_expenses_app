@@ -8,7 +8,8 @@ import '../models/goal.dart';
 class GoalCard extends StatefulWidget {
   final AppData appData;
   final Goal goal;
-  const GoalCard({super.key, required this.appData, required this.goal});
+  final VoidCallback onChanged;
+  const GoalCard({super.key, required this.appData, required this.goal, required this.onChanged});
 
   @override
   State<GoalCard> createState() => _GoalCardState();
@@ -82,13 +83,14 @@ class _GoalCardState extends State<GoalCard> {
   Widget build(BuildContext context) {
     return InkWell(
       borderRadius: BorderRadius.circular(20.r),
-      onTap: (){
-        Navigator.push(
+      onTap: () async {
+        await Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => GoalDetailPage(goal: widget.goal, appData: widget.appData,),
           ),
         );
+        widget.onChanged();
       },
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 15.h),

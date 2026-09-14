@@ -126,6 +126,7 @@ class _WalletPageState extends State<WalletPage> {
                   return GoalCard(
                     goal: goal,
                     appData: widget.appData,
+                    onChanged: () => setState(() {}),
                   );
                 }),
 
