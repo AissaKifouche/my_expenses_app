@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:my_expenses/data/app_data.dart';
 import 'package:my_expenses/widgets/day_stats.dart';
 import 'package:my_expenses/widgets/month_stats.dart';
 import 'package:my_expenses/widgets/week_stats.dart';
@@ -11,7 +12,8 @@ enum TimeFilter {day, week, month, year}
 
 
 class StatsPage extends StatefulWidget {
-  const StatsPage({super.key});
+  final AppData appData;
+  const StatsPage({super.key, required this.appData});
 
   @override
   State<StatsPage> createState() => _StatsPageState();

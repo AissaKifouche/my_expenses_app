@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:my_expenses/data/app_data.dart';
 import 'package:my_expenses/models/transaction.dart';
 import 'package:my_expenses/screens/transaction_details.dart';
 
@@ -9,8 +10,8 @@ import 'package:my_expenses/screens/transaction_details.dart';
 class AddTransactionSheet extends StatefulWidget {
 
   final Transaction? initialTransaction;
-
-  const AddTransactionSheet({super.key, this.initialTransaction});
+  final AppData appData;
+  const AddTransactionSheet({super.key, this.initialTransaction, required this.appData});
 
   @override
   State<AddTransactionSheet> createState() => _AddTransactionSheetState();
@@ -196,7 +197,7 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
                       prefixIcon: Padding(
                         padding: EdgeInsets.only(left: 16.w, right: 6.w),
                         child: Text(
-                          '\$',
+                          '${widget.appData.currency.symbol} ',
                           style: TextStyle(fontSize: 28.sp, fontWeight: FontWeight.w700, color: _accent),
                         ),
                       ),

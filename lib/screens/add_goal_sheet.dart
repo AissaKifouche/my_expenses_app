@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:my_expenses/data/app_data.dart';
 import '../models/goal.dart';
 
 
 
 class AddGoalSheet extends StatefulWidget {
   final Goal? initialGoal;
-  const AddGoalSheet({super.key, this.initialGoal});
+  final AppData appData;
+  const AddGoalSheet({super.key, this.initialGoal, required this.appData});
 
   @override
   State<AddGoalSheet> createState() => _AddGoalSheetState();
@@ -116,7 +118,7 @@ class _AddGoalSheetState extends State<AddGoalSheet> {
                     keyboardType: const TextInputType.numberWithOptions(decimal: true),
                     inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}'))],
                     style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w600),
-                    decoration: _fieldDecoration('0.00', prefixText: '\$ '),
+                    decoration: _fieldDecoration('0.00', prefixText: '${widget.appData.currency.symbol} '),
                     validator: (v) {
                       if (v == null || v.trim().isEmpty) return 'Enter a target amount';
                       final parsed = double.tryParse(v.trim());

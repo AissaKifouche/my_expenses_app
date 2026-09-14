@@ -40,7 +40,7 @@ Future<double?> showAddOrRemoveDialog(BuildContext context, AppData appData, boo
                     fontWeight: FontWeight.w600,
                   ),
                   decoration: InputDecoration(
-                    prefixText: '\$ ',
+                    prefixText: '${appData.currency.symbol} ',
                     prefixStyle: TextStyle(fontSize: 22.sp, fontWeight: FontWeight.w600),
                     hintText: '0.00',
                     contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 18.h),
@@ -65,7 +65,7 @@ Future<double?> showAddOrRemoveDialog(BuildContext context, AppData appData, boo
             SizedBox(height: 15.h,),
 
             Text(
-              add ? "Available in wallet: \$ ${appData.wallet.balance}" : "Saved in this goal: \$ ${goal.savedAmount}",
+              add ? "Available in wallet: ${appData.currency.symbol} ${appData.wallet.balance}" : "Saved in this goal: ${appData.currency.symbol} ${goal.savedAmount}",
               style: TextStyle(
                 fontSize: 20.sp,
                 fontWeight: FontWeight.w600,

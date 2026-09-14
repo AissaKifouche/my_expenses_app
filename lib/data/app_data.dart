@@ -2,6 +2,7 @@ import 'package:my_expenses/models/goal.dart';
 import 'package:my_expenses/models/monthly_budget.dart';
 import 'package:my_expenses/models/transaction.dart';
 import 'package:my_expenses/models/wallet.dart';
+import 'package:my_expenses/widgets/currency.dart';
 
 class AppData {
   Wallet wallet = Wallet(
@@ -9,6 +10,7 @@ class AppData {
     balance: 0,
   );
 
+  Currency currency = currencies[0];
   List<Transaction> transactions = [];
   List<MonthlyBudget> budgets = [];
   List<Goal> goals = [];

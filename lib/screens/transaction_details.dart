@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:my_expenses/data/app_data.dart';
 import 'package:my_expenses/models/transaction.dart';
-import 'package:my_expenses/screens/add_transaction_sheet.dart'; // adjust path to your model file
+import 'package:my_expenses/screens/add_transaction_sheet.dart';
 
 
 class TransactionDetailPage extends StatelessWidget {
+  final AppData appData;
   final Transaction transaction;
   final Function(String) onDelete;
   final Function(Transaction) onUpdate;
 
-  const TransactionDetailPage({super.key, required this.transaction, required this.onDelete, required this.onUpdate});
+  const TransactionDetailPage({super.key,required this.appData, required this.transaction, required this.onDelete, required this.onUpdate});
 
   static const _teal = Color(0xFF058E84);
   static const _tealDark = Color(0xFF06655E);
@@ -30,7 +32,7 @@ class TransactionDetailPage extends StatelessWidget {
         backgroundColor: _bg,
         body: CustomScrollView(
           slivers: [
-            SliverToBoxAdapter(child: _Header(transaction: transaction, accent: _accent, isIncome: _isIncome)),
+            SliverToBoxAdapter(child: _Header(transaction: transaction, accent: _accent, isIncome: _isIncome, appData: appData,)),
             SliverToBoxAdapter(
               child: Padding(
                 padding: EdgeInsets.fromLTRB(20.w, 28.h, 20.w, 32.h),
@@ -102,7 +104,7 @@ class TransactionDetailPage extends StatelessWidget {
                                   maxHeight: MediaQuery.of(context).size.height * 0.7,
                                 ),
                                 builder: (context) {
-                                  return AddTransactionSheet(initialTransaction: transaction,);
+                                  return AddTransactionSheet(initialTransaction: transaction, appData: appData,);
                                 }
                               );
 
@@ -211,11 +213,12 @@ class TransactionDetailPage extends StatelessWidget {
 
 /// Top banner: back button, category icon badge and the headline amount.
 class _Header extends StatelessWidget {
+  final AppData appData;
   final Transaction transaction;
   final Color accent;
   final bool isIncome;
 
-  const _Header({required this.transaction, required this.accent, required this.isIncome});
+  const _Header({required this.transaction, required this.accent, required this.isIncome, required this.appData});
 
   @override
   Widget build(BuildContext context) {
@@ -256,7 +259,7 @@ class _Header extends StatelessWidget {
           ),
           SizedBox(height: 6.h),
           Text(
-            '${isIncome ? '+' : '-'} ${transaction.amount.toStringAsFixed(2)}',
+            '${isIncome ? '+' : '-'} ${appData.currency.symbol}${transaction.amount.toStringAsFixed(2)}',
             style: TextStyle(color: Colors.white, fontSize: 40.sp, fontWeight: FontWeight.w700),
           ),
         ],

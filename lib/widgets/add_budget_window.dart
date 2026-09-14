@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
+import 'package:my_expenses/data/app_data.dart';
 import '../models/monthly_budget.dart';
 
-Future<MonthlyBudget?> showSetBudgetDialog(BuildContext context) async {
+Future<MonthlyBudget?> showSetBudgetDialog(BuildContext context, AppData appData) async {
   final controller = TextEditingController();
   final formKey = GlobalKey<FormState>();
   final now = DateTime.now();
@@ -32,7 +33,7 @@ Future<MonthlyBudget?> showSetBudgetDialog(BuildContext context) async {
               inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}'))],
               style: TextStyle(fontSize: 22.sp, fontWeight: FontWeight.w600),
               decoration: InputDecoration(
-                prefixText: '\$ ',
+                prefixText: '${appData.currency.symbol} ',
                 prefixStyle: TextStyle(fontSize: 22.sp, fontWeight: FontWeight.w600),
                 hintText: '0.00',
                 contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 18.h),

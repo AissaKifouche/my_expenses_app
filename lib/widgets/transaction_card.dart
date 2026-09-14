@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:my_expenses/data/app_data.dart';
 import 'package:my_expenses/models/transaction.dart';
 import 'package:flutter_utils/flutter_utils.dart';
 import 'package:my_expenses/screens/transaction_details.dart';
 
 class TransactionCard extends StatelessWidget {
+  final AppData appData;
   final Transaction transaction;
   final Function(String) onDelete;
   final Function(Transaction) onUpdate;
-  const TransactionCard({super.key, required this.transaction, required this.onDelete, required this.onUpdate});
+  const TransactionCard({super.key, required this.transaction, required this.onDelete, required this.onUpdate, required this.appData});
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +20,7 @@ class TransactionCard extends StatelessWidget {
         Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => TransactionDetailPage(transaction: transaction, onDelete: onDelete, onUpdate: onUpdate,),
+              builder: (context) => TransactionDetailPage(transaction: transaction, onDelete: onDelete, onUpdate: onUpdate, appData: appData,),
             )
         );
       },
@@ -56,7 +58,7 @@ class TransactionCard extends StatelessWidget {
             ),
 
             Text(
-              ( transaction.transactionType == TransactionType.expense ) ? "-\$ ${transaction.amount}" : "+\$ ${transaction.amount}",
+              ( transaction.transactionType == TransactionType.expense ) ? "-${appData.currency.symbol} ${transaction.amount}" : "+${appData.currency.symbol} ${transaction.amount}",
               style: TextStyle(
                 fontSize: 20.sp,
                 color: ( transaction.transactionType == TransactionType.expense ) ? Colors.redAccent : Colors.greenAccent,

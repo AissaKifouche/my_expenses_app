@@ -33,9 +33,9 @@ class _MainShellState extends State<MainShell> {
         index: _selectedIndex,
         children: [
           HomePage(onNavigateToTab: onItemTapped, appData: appData,),
-          StatsPage(),
+          StatsPage(appData: appData,),
           WalletPage(appData: appData,),
-          SettingsPage(),
+          SettingsPage(appData: appData,),
         ],
       ),
 

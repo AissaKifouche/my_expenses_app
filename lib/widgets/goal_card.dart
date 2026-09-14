@@ -117,10 +117,10 @@ class _GoalCardState extends State<GoalCard> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "\$ ${widget.goal.savedAmount}",
+                  "${widget.appData.currency.symbol} ${widget.goal.savedAmount}",
                 ),
                 Text(
-                  "\$ ${widget.goal.targetedAmount}",
+                  "${widget.appData.currency.symbol} ${widget.goal.targetedAmount}",
                 ),
               ],
             ),

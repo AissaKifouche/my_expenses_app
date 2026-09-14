@@ -20,19 +20,11 @@ class _BudgetCardState extends State<BudgetCard> {
 
   @override
   Widget build(BuildContext context) {
-
     MonthlyBudget? monthlyBudget;
-
     int i = widget.appData.budgets.indexWhere((b) => b.year == now.year && b.month == now.month);
-    if( i == -1 ){
-
-    }
-    else{
+    if( i != -1 ){
       monthlyBudget = widget.appData.budgets[i];
     }
-
-
-
 
     return (monthlyBudget == null)? noBudgetExist() : budgetExists(monthlyBudget);
 
@@ -71,7 +63,7 @@ class _BudgetCardState extends State<BudgetCard> {
             SizedBox(height: 4.h,),
 
             Text(
-              " \$${budget.spent.toStringAsFixed(2)}",
+              " ${widget.appData.currency.symbol} ${budget.spent.toStringAsFixed(2)}",
               style: TextStyle(
                 fontSize: 30.sp,
                 color: Colors.white,
@@ -85,7 +77,7 @@ class _BudgetCardState extends State<BudgetCard> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "Budget: \$${budget.amount.toStringAsFixed(2)}",
+                  "Budget: ${widget.appData.currency.symbol} ${budget.amount.toStringAsFixed(2)}",
                   style: TextStyle(
                     fontSize: 14.sp,
                     color: Colors.white,
@@ -93,7 +85,7 @@ class _BudgetCardState extends State<BudgetCard> {
                 ),
 
                 Text(
-                  "Remaining: \$${budget.remaining.toStringAsFixed(2)}",
+                  "Remaining: ${widget.appData.currency.symbol} ${budget.remaining.toStringAsFixed(2)}",
                   style: TextStyle(
                     fontSize: 14.sp,
                     color: Colors.white,
@@ -181,7 +173,7 @@ class _BudgetCardState extends State<BudgetCard> {
 
           InkWell(
             onTap: ()  async {
-              MonthlyBudget? b = await showSetBudgetDialog(context);
+              MonthlyBudget? b = await showSetBudgetDialog(context, widget.appData);
               if (b != null){
                 setState(() {
                   widget.appData.addBudget(b);

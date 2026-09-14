@@ -44,7 +44,7 @@ class _HomePageState extends State<HomePage> {
               ),
               context: context,
               builder: (context) {
-                return AddTransactionSheet();
+                return AddTransactionSheet(appData: widget.appData,);
               }
             );
 
@@ -147,6 +147,7 @@ class _HomePageState extends State<HomePage> {
                                 return Padding(
                                   padding: EdgeInsets.only(bottom: 15.h),
                                   child: TransactionCard(
+                                    appData: widget.appData,
                                     transaction: transaction, 
                                     onDelete: (id){
                                       setState(() {

@@ -74,7 +74,7 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                   ),
                   SizedBox(height: 6.h),
                   Text(
-                    '\$${widget.goal.savedAmount.toStringAsFixed(2)} of \$${widget.goal.targetedAmount.toStringAsFixed(2)}',
+                    '${widget.appData.currency.symbol}${widget.goal.savedAmount.toStringAsFixed(2)} of ${widget.appData.currency.symbol}${widget.goal.targetedAmount.toStringAsFixed(2)}',
                     style: TextStyle(color: Colors.white70, fontSize: 15.sp),
                   ),
                 ],
@@ -118,11 +118,11 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                     ),
                     child: Column(
                       children: [
-                        _DetailRow(label: 'Saved', value: '\$${widget.goal.savedAmount.toStringAsFixed(2)}'),
+                        _DetailRow(label: 'Saved', value: '${widget.appData.currency.symbol}${widget.goal.savedAmount.toStringAsFixed(2)}'),
                         const Divider(height: 1, color: Color(0xFFE8E8E8)),
-                        _DetailRow(label: 'Target', value: '\$${widget.goal.targetedAmount.toStringAsFixed(2)}'),
+                        _DetailRow(label: 'Target', value: '${widget.appData.currency.symbol}${widget.goal.targetedAmount.toStringAsFixed(2)}'),
                         const Divider(height: 1, color: Color(0xFFE8E8E8)),
-                        _DetailRow(label: 'Remaining', value: '\$${widget.goal.remaining.toStringAsFixed(2)}'),
+                        _DetailRow(label: 'Remaining', value: '${widget.appData.currency.symbol}${widget.goal.remaining.toStringAsFixed(2)}'),
                       ],
                     ),
                   ),
@@ -197,7 +197,7 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                                 maxHeight: MediaQuery.of(context).size.height * 0.7,
                               ),
                               builder: (context) {
-                                return AddGoalSheet(initialGoal: widget.goal,);
+                                return AddGoalSheet(initialGoal: widget.goal, appData: widget.appData,);
                               }
                             );
 

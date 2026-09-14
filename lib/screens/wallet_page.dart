@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:my_expenses/data/app_data.dart';
 import 'package:my_expenses/models/goal.dart';
-import 'package:my_expenses/models/wallet.dart';
 import 'package:my_expenses/screens/add_goal_sheet.dart';
 import 'package:my_expenses/widgets/goal_card.dart';
 
@@ -32,7 +31,7 @@ class _WalletPageState extends State<WalletPage> {
             ),
             context: context,
             builder: (context) {
-              return AddGoalSheet();
+              return AddGoalSheet(appData: widget.appData,);
             }
           );
 
@@ -92,7 +91,7 @@ class _WalletPageState extends State<WalletPage> {
                     SizedBox(height: 30.h,),
 
                     Text(
-                      "\$ ${widget.appData.wallet.balance}",
+                      "${widget.appData.currency.symbol} ${widget.appData.wallet.balance}",
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 34.sp,

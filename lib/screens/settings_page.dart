@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:my_expenses/data/app_data.dart';
 import 'package:my_expenses/widgets/currency.dart';
 
-import '../buttom_clipper.dart';
 
 class SettingsPage extends StatefulWidget {
-  const SettingsPage({super.key});
+  final AppData appData;
+  const SettingsPage({super.key, required this.appData});
 
   @override
   State<SettingsPage> createState() => _SettingsPageState();
@@ -15,7 +15,7 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
 
-  Currency _selectedCurrency = currencies[0];
+
   bool darkMode = false;
 
   @override
@@ -100,10 +100,10 @@ class _SettingsPageState extends State<SettingsPage> {
                         ),
 
                         CurrencyContainerPicker(
-                            selectedCurrency: _selectedCurrency,
+                            selectedCurrency: widget.appData.currency,
                             onCurrencySelected: (currency) {
                               setState(() {
-                                _selectedCurrency = currency;
+                                widget.appData.currency = currency;
                               });
                             }
                         ),
