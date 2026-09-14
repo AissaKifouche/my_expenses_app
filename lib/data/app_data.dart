@@ -22,7 +22,9 @@ class AppData {
     transaction.transactionType == TransactionType.income ? wallet.balance += transaction.amount : wallet.balance -= transaction.amount;
     if (transaction.transactionType == TransactionType.expense){
       int index = budgets.indexWhere((budget) => budget.month == transaction.dateTime.month && budget.year == transaction.dateTime.year);
-      budgets[index].addExpense(transaction.amount);
+      if(index != -1 ){
+        budgets[index].addExpense(transaction.amount);
+      }
     }
   }
 
@@ -30,7 +32,9 @@ class AppData {
     int index = transactions.indexWhere((transaction) => transaction.id == id);
     if (transactions[index].transactionType == TransactionType.expense){
       int i = budgets.indexWhere((budget) => budget.month == transactions[index].dateTime.month && budget.year == transactions[index].dateTime.year);
-      budgets[i].deleteExpense(transactions[index].amount);
+      if (i != -1){
+        budgets[i].deleteExpense(transactions[index].amount);
+      }
     }
     transactions[index].transactionType == TransactionType.income ?
         wallet.balance -= transactions[index].amount
@@ -41,25 +45,45 @@ class AppData {
   void editTransaction(Transaction updated){
     int index = transactions.indexWhere((transaction) => transaction.id == updated.id);
     if (index != -1){
-      int i = budgets.indexWhere((b) => b.month == updated.dateTime.month && b.year == updated.dateTime.year);
       Transaction oldTransaction = transactions[index];
       double oldAmount = oldTransaction.amount;
       double newAmount = updated.amount;
       transactions[index] = updated;
+      int j = budgets.indexWhere((test) => test.year == oldTransaction.dateTime.year && test.month == oldTransaction.dateTime.month);
+      int i = budgets.indexWhere((b) => b.month == updated.dateTime.month && b.year == updated.dateTime.year);
+
+      //case both are incomes
       if(oldTransaction.transactionType == TransactionType.income && updated.transactionType == TransactionType.income){
         wallet.balance += newAmount - oldAmount;
       }
+
+      //case both are expenses
       else if(oldTransaction.transactionType == TransactionType.expense && updated.transactionType == TransactionType.expense){
         wallet.balance += oldAmount - newAmount;
-        budgets[i].addExpense(newAmount - oldAmount);
+        if (i != -1){
+          budgets[i].addExpense(newAmount);
+        }
+
+        if (j != -1){
+          budgets[j].deleteExpense(oldAmount);
+        }
+
       }
+
+      //case old is income new is expense
       else if(oldTransaction.transactionType == TransactionType.income && updated.transactionType == TransactionType.expense){
         wallet.balance -= oldAmount + newAmount;
-        budgets[i].addExpense(newAmount);
+        if (i != -1){
+          budgets[i].addExpense(newAmount);
+        }
       }
+
+      //case old is expense new is income
       else {
         wallet.balance += oldAmount + newAmount;
-        budgets[i].deleteExpense(oldAmount);
+        if (j != -1){
+          budgets[j].deleteExpense(oldAmount);
+        }
       }
     }
   }
@@ -67,6 +91,13 @@ class AppData {
 
   //add a monthly budget to the list
   void addBudget(MonthlyBudget budget){
+    budget.addExpense(
+        transactions.where((test)
+        => test.transactionType == TransactionType.expense &&
+            test.dateTime.year == budget.year &&
+            test.dateTime.month == budget.month
+        ).fold(0, (sum, transaction) => sum + transaction.amount)
+    );
     budgets.add(budget);
   }
 
@@ -111,6 +142,25 @@ class AppData {
     if(i != -1){
       goals[i] = updated;
     }
+  }
+
+
+  //get expenses of a month
+  double getMonthlyExpenses(int year, int month){
+    return transactions.where((test)
+      => test.transactionType == TransactionType.expense &&
+        test.dateTime.year == year &&
+        test.dateTime.month == month
+    ).fold(0, (sum, transaction) => sum + transaction.amount);
+  }
+
+  //get income of a month
+  double getMonthlyIncome(int year, int month){
+    return transactions.where((test)
+    => test.transactionType == TransactionType.income &&
+        test.dateTime.year == year &&
+        test.dateTime.month == month
+    ).fold(0, (sum, transaction) => sum + transaction.amount);
   }
 
 }

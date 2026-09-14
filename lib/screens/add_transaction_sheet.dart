@@ -66,8 +66,8 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
     final picked = await showDatePicker(
       context: context,
       initialDate: _dateTime,
-      firstDate: DateTime(now.year, now.month, 1),
-      lastDate: DateTime(now.year, now.month + 1, 0),
+      firstDate: DateTime(2020),
+      lastDate: now,
       builder: (context, child) => Theme(
         data: Theme.of(context).copyWith(
           colorScheme: ColorScheme.light(primary: _accent),
