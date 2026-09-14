@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:my_expenses/data/app_data.dart';
+import 'package:my_expenses/screens/transaction_details.dart';
 
 
 class StatsPage extends StatefulWidget {
@@ -62,7 +63,7 @@ class _StatsPageState extends State<StatsPage> {
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(16.r),
                   boxShadow: [
-                    BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 10, offset: const Offset(0, 4)),
+                    BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 10, offset: const Offset(0, 4)),
                   ],
                 ),
                 child: Row(
@@ -193,9 +194,15 @@ class _StatsPageState extends State<StatsPage> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
-                              e.key.toString().split('.').last,
-                              style: TextStyle(fontSize: 14.sp, color: Colors.black87),
+                            Row(
+                              children: [
+                                Icon(TransactionDetailPage.categoryIcon(e.key), size: 18.sp, color: Colors.black54),
+                                SizedBox(width: 10.w),
+                                Text(
+                                  TransactionDetailPage.categoryLabel(e.key),
+                                  style: TextStyle(fontSize: 14.sp, color: Colors.black87),
+                                ),
+                              ],
                             ),
                             Text(
                               '$symbol ${e.value.toStringAsFixed(2)}',
@@ -259,7 +266,7 @@ class _SummaryCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(18.r),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 8, offset: const Offset(0, 3)),
+          BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 8, offset: const Offset(0, 3)),
         ],
       ),
       child: Column(
@@ -267,7 +274,7 @@ class _SummaryCard extends StatelessWidget {
         children: [
           Container(
             padding: EdgeInsets.all(8.w),
-            decoration: BoxDecoration(color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(10.r)),
+            decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(10.r)),
             child: Icon(icon, size: 18.sp, color: color),
           ),
           SizedBox(height: 14.h),
