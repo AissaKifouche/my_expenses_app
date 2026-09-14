@@ -52,6 +52,9 @@ Future<double?> showAddOrRemoveDialog(BuildContext context, AppData appData, boo
                     if (parsed == null || parsed <= 0) return 'Enter a valid amount';
                     if (add){
                       if (parsed > appData.wallet.balance) return 'Amount exceeds wallet balance';
+                      if (goal.savedAmount + parsed > goal.targetedAmount) {
+                        return 'Amount exceeds the remaining target (${appData.currency.symbol} ${goal.remaining.toStringAsFixed(2)} left)';
+                      }
                     }
                     else{
                       if (parsed > goal.savedAmount) return 'Amount exceeds what is saved in this goal';
