@@ -10,61 +10,90 @@ class TransactionCard extends StatelessWidget {
   final Transaction transaction;
   final Function(String) onDelete;
   final Function(Transaction) onUpdate;
-  const TransactionCard({super.key, required this.transaction, required this.onDelete, required this.onUpdate, required this.appData});
+
+  const TransactionCard({
+    super.key,
+    required this.transaction,
+    required this.onDelete,
+    required this.onUpdate,
+    required this.appData,
+  });
+
+  static const _income = Color(0xFF058E84);
+  static const _expense = Color(0xFFE0674A);
+
+  bool get _isExpense => transaction.transactionType == TransactionType.expense;
+  Color get _accent => _isExpense ? _expense : _income;
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       borderRadius: BorderRadius.circular(15.r),
-      onTap: (){
+      splashColor: _accent.withValues(alpha: 0.08),
+      highlightColor: _accent.withValues(alpha: 0.04),
+      onTap: () {
         Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => TransactionDetailPage(transaction: transaction, onDelete: onDelete, onUpdate: onUpdate, appData: appData,),
-            )
+          context,
+          MaterialPageRoute(
+            builder: (context) => TransactionDetailPage(
+              transaction: transaction,
+              onDelete: onDelete,
+              onUpdate: onUpdate,
+              appData: appData,
+            ),
+          ),
         );
       },
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 5.h),
+        padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 12.h),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(15.r),
-          border: BoxBorder.all(color: Colors.black.withAlpha(25))
+          border: Border.all(color: Colors.black.withAlpha(25)),
         ),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  transaction.title,
-                  style: TextStyle(
-                    fontSize: 18.sp,
-                    color: Colors.black,
-                  ),
-                ),
-
-                SizedBox(height: 6.h,),
-
-                Text(
-                  Times.formatRelativeDate(transaction.dateTime),
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                    color: Colors.grey[800],
-                  ),
-                ),
-              ],
-            ),
-
-            Text(
-              ( transaction.transactionType == TransactionType.expense ) ? "-${appData.currency.symbol} ${transaction.amount}" : "+${appData.currency.symbol} ${transaction.amount}",
-              style: TextStyle(
-                fontSize: 20.sp,
-                color: ( transaction.transactionType == TransactionType.expense ) ? Colors.redAccent : Colors.greenAccent,
-                fontWeight: FontWeight.w500
+            // category icon badge
+            Container(
+              padding: EdgeInsets.all(10.w),
+              decoration: BoxDecoration(
+                color: _accent.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12.r),
               ),
-            )
+              child: Icon(
+                TransactionDetailPage.categoryIcon(transaction.category),
+                size: 20.sp,
+                color: _accent,
+              ),
+            ),
+            SizedBox(width: 14.w),
+
+            // title + date
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    transaction.title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w500, color: Colors.black87),
+                  ),
+                  SizedBox(height: 4.h),
+                  Text(
+                    Times.formatRelativeDate(transaction.dateTime),
+                    style: TextStyle(fontSize: 13.sp, color: Colors.grey[600]),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(width: 10.w),
+
+            // amount
+            Text(
+              '${_isExpense ? '-' : '+'}${appData.currency.symbol} ${transaction.amount.toStringAsFixed(2)}',
+              style: TextStyle(fontSize: 16.sp, color: _accent, fontWeight: FontWeight.w600),
+            ),
           ],
         ),
       ),

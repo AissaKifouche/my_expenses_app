@@ -14,13 +14,16 @@ class WalletPage extends StatefulWidget {
 }
 
 class _WalletPageState extends State<WalletPage> {
-
-
+  static const _teal = Color(0xFF219289);
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    final balance = widget.appData.wallet.balance;
+    final symbol = widget.appData.currency.symbol;
+    final goals = widget.appData.goals;
 
+    return Scaffold(
+      backgroundColor: const Color(0xFFF7F8F8),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
           final newGoal = await showModalBottomSheet<Goal>(
@@ -31,104 +34,125 @@ class _WalletPageState extends State<WalletPage> {
             ),
             context: context,
             builder: (context) {
-              return AddGoalSheet(appData: widget.appData,);
-            }
+              return AddGoalSheet(appData: widget.appData);
+            },
           );
 
-          if(newGoal != null){
+          if (newGoal != null) {
             setState(() {
               widget.appData.addGoal(newGoal);
             });
           }
         },
-        backgroundColor: Color(0xFF2F948D),
+        backgroundColor: const Color(0xFF2F948D),
         label: Text(
           "Add a goal",
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 18.sp
-          ),
+          style: TextStyle(color: Colors.white, fontSize: 15.sp, fontWeight: FontWeight.w600),
         ),
-        icon: Icon(Icons.add, color: Colors.white, size: 40.h,),
+        icon: Icon(Icons.add_rounded, color: Colors.white, size: 22.sp),
       ),
-
       appBar: AppBar(
-        backgroundColor: Color(0xFF219289),
+        backgroundColor: _teal,
         title: Text(
           "Wallet",
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 28.sp,
-          ),
+          style: TextStyle(color: Colors.white, fontSize: 24.sp, fontWeight: FontWeight.w600),
         ),
       ),
-
       body: SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 45.h),
+          padding: EdgeInsets.fromLTRB(20.w, 24.h, 20.w, 100.h),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
-              //the wallet card
+              // wallet balance card
               Container(
-                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+                padding: EdgeInsets.symmetric(horizontal: 22.w, vertical: 26.h),
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  color: widget.appData.wallet.balance >= 0 ? Color(0xFF296D68) : Colors.red,
-                  borderRadius: BorderRadius.circular(20.r)
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: balance >= 0
+                        ? [const Color(0xFF429690), const Color(0xFF058E84)]
+                        : [const Color(0xFFE0674A), const Color(0xFFC94A2E)],
+                  ),
+                  borderRadius: BorderRadius.circular(22.r),
                 ),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      widget.appData.wallet.name,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 26.sp,
-                      ),
+                    Row(
+                      children: [
+                        Icon(Icons.account_balance_wallet_rounded, color: Colors.white70, size: 18.sp),
+                        SizedBox(width: 8.w),
+                        Text(
+                          widget.appData.wallet.name,
+                          style: TextStyle(color: Colors.white70, fontSize: 14.sp, fontWeight: FontWeight.w500),
+                        ),
+                      ],
                     ),
-
-                    SizedBox(height: 30.h,),
-
+                    SizedBox(height: 12.h),
                     Text(
-                      "${widget.appData.currency.symbol} ${widget.appData.wallet.balance}",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 34.sp,
-                      ),
-                    )
+                      '$symbol ${balance.toStringAsFixed(2)}',
+                      style: TextStyle(color: Colors.white, fontSize: 34.sp, fontWeight: FontWeight.w700),
+                    ),
                   ],
                 ),
               ),
 
-              SizedBox(height: 60.h,),
+              SizedBox(height: 32.h),
 
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Your Goals',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 22.sp,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Your goals',
+                    style: TextStyle(color: Colors.black87, fontSize: 19.sp, fontWeight: FontWeight.w600),
                   ),
-                ),
+                  if (goals.isNotEmpty)
+                    Text(
+                      '${goals.length}',
+                      style: TextStyle(color: Colors.black45, fontSize: 14.sp, fontWeight: FontWeight.w500),
+                    ),
+                ],
               ),
 
-              SizedBox(height: 30.h,),
+              SizedBox(height: 16.h),
 
-              if (widget.appData.goals.isEmpty)
-                Text(
-                  "No goals at the moment",
+              if (goals.isEmpty)
+                Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.symmetric(vertical: 36.h),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16.r),
+                  ),
+                  alignment: Alignment.center,
+                  child: Column(
+                    children: [
+                      Icon(Icons.flag_outlined, size: 28.sp, color: Colors.black26),
+                      SizedBox(height: 10.h),
+                      Text(
+                        'No goals yet — tap "Add a goal" to start saving',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.black45, fontSize: 14.sp),
+                      ),
+                    ],
+                  ),
                 )
               else
-                ...widget.appData.goals.map((goal) {
-                  return GoalCard(
-                    goal: goal,
-                    appData: widget.appData,
-                    onChanged: () => setState(() {}),
-                  );
-                }),
-
+                Column(
+                  children: goals
+                      .map((goal) => Padding(
+                    padding: EdgeInsets.only(bottom: 14.h),
+                    child: GoalCard(
+                      goal: goal,
+                      appData: widget.appData,
+                      onChanged: () => setState(() {}),
+                    ),
+                  ))
+                      .toList(),
+                ),
             ],
           ),
         ),
