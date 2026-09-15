@@ -179,4 +179,44 @@ class AppData {
     return result;
   }
 
+
+
+  //a method that returns the expenses of last 6 months
+  List<MonthlyExpense> getLastSixMonthsExpenses(int year, int month) {
+    final result = <MonthlyExpense>[];
+    DateTime selectedDate = DateTime(year, month);
+    for (int i = 5; i >= 0; i--) {
+      final date = DateTime(
+        selectedDate.year,
+        selectedDate.month - i,
+      );
+      final amount = getMonthlyExpenses(
+        date.year,
+        date.month,
+      );
+      result.add(
+        MonthlyExpense(
+          year: date.year,
+          month: date.month,
+          amount: amount,
+        ),
+      );
+    }
+    return result;
+  }
+
+}
+
+
+//the piece of data used in getLastSixMonthsExpenses
+class MonthlyExpense {
+  final int year;
+  final int month;
+  final double amount;
+
+  MonthlyExpense({
+    required this.year,
+    required this.month,
+    required this.amount,
+  });
 }
