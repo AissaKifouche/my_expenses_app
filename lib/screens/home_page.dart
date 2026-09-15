@@ -5,13 +5,13 @@ import 'package:my_expenses/buttom_clipper.dart';
 import 'package:my_expenses/data/app_data.dart';
 import 'package:my_expenses/models/transaction.dart';
 import 'package:my_expenses/screens/add_transaction_sheet.dart';
+import 'package:my_expenses/screens/all_transactions_page.dart';
 import 'package:my_expenses/widgets/budget_card.dart';
 import 'package:my_expenses/widgets/transaction_card.dart';
 
 class HomePage extends StatefulWidget {
   final AppData appData;
-  final void Function(int) onNavigateToTab;
-  const HomePage({super.key, required this.onNavigateToTab, required this.appData});
+  const HomePage({super.key, required this.appData});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -115,7 +115,12 @@ class _HomePageState extends State<HomePage> {
                                 ),
                                 if (sortedTransactions.isNotEmpty)
                                   TextButton(
-                                    onPressed: () => widget.onNavigateToTab(1),
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(builder: (context) => AllTransactionsPage(appData: widget.appData)),
+                                      );
+                                    },
                                     child: Text(
                                       "See all",
                                       style: TextStyle(color: Colors.grey, fontSize: 14.sp),
