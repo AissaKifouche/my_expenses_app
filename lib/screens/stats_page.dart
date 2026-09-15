@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:my_expenses/data/app_data.dart';
 import 'package:my_expenses/screens/transaction_details.dart';
-
+import 'package:my_expenses/widgets/six_months_chart.dart';
 
 class StatsPage extends StatefulWidget {
   final AppData appData;
@@ -18,9 +18,6 @@ class _StatsPageState extends State<StatsPage> {
   static const _income = Color(0xFF2FAE6B);
   static const _expense = Color(0xFFE0674A);
 
-
-  // this needs to live in State, not be re-created every build,
-  // otherwise the month selector can never remember your choice
   DateTime selectedMonth = DateTime(DateTime.now().year, DateTime.now().month);
 
   bool get _isCurrentMonth {
@@ -36,6 +33,8 @@ class _StatsPageState extends State<StatsPage> {
 
   @override
   Widget build(BuildContext context) {
+    // now tracks the month selector, so the chart updates when you navigate months
+    final sixMonthData = widget.appData.getLastSixMonthsExpenses(selectedMonth.year, selectedMonth.month);
     final income = widget.appData.getMonthlyIncome(selectedMonth.year, selectedMonth.month);
     final expenses = widget.appData.getMonthlyExpenses(selectedMonth.year, selectedMonth.month);
     final balance = income - expenses;
@@ -52,7 +51,7 @@ class _StatsPageState extends State<StatsPage> {
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 24.h),
+          padding: EdgeInsets.fromLTRB(20.w, 24.h, 20.w, 40.h),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -89,7 +88,7 @@ class _StatsPageState extends State<StatsPage> {
                 width: double.infinity,
                 padding: EdgeInsets.symmetric(horizontal: 22.w, vertical: 22.h),
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
+                  gradient: const LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [Color(0xFF429690), Color(0xFF058E84)],
@@ -158,8 +157,6 @@ class _StatsPageState extends State<StatsPage> {
               ),
               SizedBox(height: 14.h),
 
-              // category breakdown placeholder — wire this up to
-              // widget.appData.getMonthlyExpensesByCategory(selectedMonth.year, selectedMonth.month)
               Builder(builder: (context) {
                 final categoryData = widget.appData.getMonthlyExpensesByCategory(
                   selectedMonth.year,
@@ -180,41 +177,75 @@ class _StatsPageState extends State<StatsPage> {
                     ),
                   );
                 }
+                final entries = categoryData.entries.toList();
                 return Container(
                   width: double.infinity,
-                  padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 6.h),
+                  padding: EdgeInsets.symmetric(horizontal: 18.w),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(16.r),
                   ),
                   child: Column(
-                    children: categoryData.entries.map((e) {
-                      return Padding(
-                        padding: EdgeInsets.symmetric(vertical: 12.h),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: [
-                                Icon(TransactionDetailPage.categoryIcon(e.key), size: 18.sp, color: Colors.black54),
-                                SizedBox(width: 10.w),
-                                Text(
-                                  TransactionDetailPage.categoryLabel(e.key),
-                                  style: TextStyle(fontSize: 14.sp, color: Colors.black87),
-                                ),
-                              ],
-                            ),
-                            Text(
-                              '$symbol ${e.value.toStringAsFixed(2)}',
-                              style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600, color: Colors.black87),
-                            ),
-                          ],
+                    children: [
+                      for (int i = 0; i < entries.length; i++) ...[
+                        Padding(
+                          padding: EdgeInsets.symmetric(vertical: 14.h),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  Container(
+                                    padding: EdgeInsets.all(7.w),
+                                    decoration: BoxDecoration(
+                                      color: _teal.withValues(alpha: 0.1),
+                                      borderRadius: BorderRadius.circular(10.r),
+                                    ),
+                                    child: Icon(
+                                      TransactionDetailPage.categoryIcon(entries[i].key),
+                                      size: 16.sp,
+                                      color: _teal,
+                                    ),
+                                  ),
+                                  SizedBox(width: 12.w),
+                                  Text(
+                                    TransactionDetailPage.categoryLabel(entries[i].key),
+                                    style: TextStyle(fontSize: 14.sp, color: Colors.black87),
+                                  ),
+                                ],
+                              ),
+                              Text(
+                                '$symbol ${entries[i].value.toStringAsFixed(2)}',
+                                style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600, color: Colors.black87),
+                              ),
+                            ],
+                          ),
                         ),
-                      );
-                    }).toList(),
+                        if (i != entries.length - 1)
+                          const Divider(height: 1, color: Color(0xFFF0F0F0)),
+                      ],
+                    ],
                   ),
                 );
               }),
+
+              SizedBox(height: 28.h),
+
+              Text(
+                'Spending history',
+                style: TextStyle(fontSize: 17.sp, fontWeight: FontWeight.w600, color: Colors.black87),
+              ),
+              SizedBox(height: 14.h),
+
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.fromLTRB(12.w, 16.h, 16.w, 8.h),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16.r),
+                ),
+                child: SixMonthExpenseChart(expenses: sixMonthData, appData: widget.appData,),
+              ),
             ],
           ),
         ),
