@@ -15,3 +15,14 @@ VALUES
     ('salary'),
     ('freelance'),
     ('other');
+
+
+    INSERT INTO currencies (code, name, symbol, flag)
+    VALUES
+        ('USD', 'US Dollar', '$', '🇺🇸'),
+        ('EUR', 'Euro', '€', '🇪🇺'),
+        ('DZD', 'Algerian Dinar', 'DA', '🇩🇿'),
+        ('GBP', 'British Pound', '£', '🇬🇧'),
+        ('CAD', 'Canadian Dollar', 'CA$', '🇨🇦'),
+        ('SAR', 'Saudi Riyal', 'SR', '🇸🇦'),
+        ('AED', 'UAE Dirham', 'AED', '🇦🇪');
