@@ -26,3 +26,6 @@ VALUES
         ('CAD', 'Canadian Dollar', 'CA$', '🇨🇦'),
         ('SAR', 'Saudi Riyal', 'SR', '🇸🇦'),
         ('AED', 'UAE Dirham', 'AED', '🇦🇪');
+
+    INSERT INTO app_settings (id, selected_currency_id)
+    VALUES (1, 1);
