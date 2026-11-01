@@ -6,6 +6,7 @@ import 'package:path_provider/path_provider.dart';
 
 import 'tables/currencies.dart';
 import 'tables/app_settings.dart';
+import 'tables/wallets.dart';
 
 part 'app_database.g.dart';
 
@@ -13,6 +14,7 @@ part 'app_database.g.dart';
   tables: [
     Currencies,
     AppSettings,
+    Wallets,
   ],
 )
 class AppDatabase extends _$AppDatabase {
