@@ -9,6 +9,7 @@ import 'tables/app_settings.dart';
 import 'tables/wallets.dart';
 import 'tables/transaction_types.dart';
 import 'tables/categories.dart';
+import 'tables/transactions.dart';
 
 part 'app_database.g.dart';
 
@@ -19,6 +20,7 @@ part 'app_database.g.dart';
     Wallets,
     TransactionTypes,
     Categories,
+    Transactions,
   ],
 )
 class AppDatabase extends _$AppDatabase {
