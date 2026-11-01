@@ -1,3 +1,4 @@
+// ignore_for_file: recursive_getters
 import 'package:drift/drift.dart';
 import 'package:my_expenses/database/tables/categories.dart';
 import 'package:my_expenses/database/tables/transaction_types.dart';
