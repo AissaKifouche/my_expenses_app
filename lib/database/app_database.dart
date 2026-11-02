@@ -17,6 +17,7 @@ import 'Daos/currency_dao.dart';
 import 'Daos/app_settings_dao.dart';
 import 'Daos/wallet_dao.dart';
 import 'Daos/transaction_dao.dart';
+import 'Daos/goal_dao.dart';
 
 part 'app_database.g.dart';
 
@@ -36,6 +37,7 @@ part 'app_database.g.dart';
     AppSettingsDao,
     WalletDao,
     TransactionDao,
+    GoalDao,
   ]
 )
 class AppDatabase extends _$AppDatabase {
