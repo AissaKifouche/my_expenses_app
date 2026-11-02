@@ -13,6 +13,8 @@ import 'tables/transactions.dart';
 import 'tables/goals.dart';
 import 'tables/monthly_budgets.dart';
 
+import 'Daos/currency_dao.dart';
+
 part 'app_database.g.dart';
 
 @DriftDatabase(
@@ -26,6 +28,9 @@ part 'app_database.g.dart';
     Goals,
     MonthlyBudgets,
   ],
+  daos: [
+    CurrencyDao,
+  ]
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
