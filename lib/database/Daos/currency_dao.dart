@@ -28,13 +28,16 @@ class CurrencyDao extends DatabaseAccessor<AppDatabase> with _$CurrencyDaoMixin 
   }
 
   //a function to update/edit a currency
-  Future<bool> updateCurrency (int id, CurrenciesCompanion currency) {
-    return (update(currencies)..where((t) => t.id.equals(id)))
-        .write(currency).then((count) => count > 0);
+  Future<bool> updateCurrency (int id, CurrenciesCompanion currency) async {
+    final count = await (update(currencies)..where((t) => t.id.equals(id)))
+        .write(currency);
+    return count > 0;
   }
 
   //a function to delete a currency
-  Future<bool> deleteCurrency(int id) {
-    return (delete(currencies)..where((t) => t.id.equals(id))).go().then((count) => count > 0);
+  Future<bool> deleteCurrency(int id) async {
+    final count = await (delete(currencies)..where((t) => t.id.equals(id))).go();
+
+    return count > 0;
   }
 }
