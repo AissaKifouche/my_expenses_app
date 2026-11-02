@@ -7,7 +7,7 @@ part 'app_settings_dao.g.dart';
 
 @DriftAccessor(tables :[AppSettings])
 class AppSettingsDao extends DatabaseAccessor<AppDatabase> with _$AppSettingsDaoMixin {
-  AppSettingsDao(AppDatabase db) : super(db);
+  AppSettingsDao(super.db);
 
   Future<AppSetting?> getSettings() {
     return select(appSettings).getSingleOrNull();

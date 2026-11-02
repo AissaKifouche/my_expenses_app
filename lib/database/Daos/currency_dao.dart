@@ -7,7 +7,7 @@ part 'currency_dao.g.dart';
 
 @DriftAccessor(tables: [Currencies])
 class CurrencyDao extends DatabaseAccessor<AppDatabase> with _$CurrencyDaoMixin {
-  CurrencyDao(AppDatabase db) : super(db);
+  CurrencyDao(super.db);
 
   //a function to select all currencies in the database
   Future<List<Currency>> getCurrencies(){

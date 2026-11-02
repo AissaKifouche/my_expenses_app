@@ -8,7 +8,7 @@ part 'wallet_dao.g.dart';
 @DriftAccessor(tables: [Wallets])
 class WalletDao extends DatabaseAccessor<AppDatabase>
     with _$WalletDaoMixin {
-  WalletDao(AppDatabase db) : super(db);
+  WalletDao(super.db);
 
   Future<List<Wallet>> getAll() {
     return select(wallets).get();

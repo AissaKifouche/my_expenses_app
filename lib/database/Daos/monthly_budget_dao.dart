@@ -7,7 +7,7 @@ part 'monthly_budget_dao.g.dart';
 
 @DriftAccessor(tables: [MonthlyBudgets])
 class MonthlyBudgetDao extends DatabaseAccessor<AppDatabase> with _$MonthlyBudgetDaoMixin{
-  MonthlyBudgetDao(AppDatabase db) : super(db);
+  MonthlyBudgetDao(super.db);
 
   //a function to select all monthly budgets
   Future<List<MonthlyBudget>> getAll() {
