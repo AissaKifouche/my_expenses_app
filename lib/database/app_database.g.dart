@@ -2312,6 +2312,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     this as AppDatabase,
   );
   late final GoalDao goalDao = GoalDao(this as AppDatabase);
+  late final MonthlyBudgetDao monthlyBudgetDao = MonthlyBudgetDao(
+    this as AppDatabase,
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
