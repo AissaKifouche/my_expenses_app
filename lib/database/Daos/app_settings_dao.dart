@@ -22,4 +22,10 @@ class AppSettingsDao extends DatabaseAccessor<AppDatabase> with _$AppSettingsDao
 
     return count > 0;
   }
+
+
+  //to insert
+  Future<int> insertSettings(AppSettingsCompanion settings) {
+    return into(appSettings).insert(settings);
+  }
 }
