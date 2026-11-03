@@ -9,7 +9,7 @@ class DatabaseSeeder {
 
   Future<void> seed() async {
     await db.transaction(() async {
-      await _seedCurrencies();
+      final usdId = await _seedCurrencies();
       await _seedTransactionTypes();
       await _seedCategories();
       await _seedSettings();
@@ -17,8 +17,8 @@ class DatabaseSeeder {
     });
   }
 
-  Future<void> _seedCurrencies() async {
-    await db.currencyDao.insertCurrency(
+  Future<int> _seedCurrencies() async {
+    final usdId = await db.currencyDao.insertCurrency(
       CurrenciesCompanion.insert(
         code: 'USD',
         name: 'US Dollar',
@@ -80,6 +80,8 @@ class DatabaseSeeder {
         flag: '🇦🇪',
       ),
     );
+
+    return usdId;
   }
 
   Future<void> _seedTransactionTypes() async {
@@ -118,11 +120,11 @@ class DatabaseSeeder {
     }
   }
 
-  Future<void> _seedSettings() async {
+  Future<void> _seedSettings(int usdId) async {
     // USD is the first currency inserted, so its generated ID is 1.
     await db.appSettingsDao.insertSettings(
       AppSettingsCompanion.insert(
-        selectedCurrencyId: 1,
+        selectedCurrencyId: usdId,
       ),
     );
   }
