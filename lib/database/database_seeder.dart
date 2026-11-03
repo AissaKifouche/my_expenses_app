@@ -12,7 +12,7 @@ class DatabaseSeeder {
       final usdId = await _seedCurrencies();
       await _seedTransactionTypes();
       await _seedCategories();
-      await _seedSettings();
+      await _seedSettings(usdId);
       await _seedWallet();
     });
   }
