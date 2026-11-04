@@ -3,6 +3,7 @@ import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
+import 'database_seeder.dart';
 
 import 'tables/currencies.dart';
 import 'tables/app_settings.dart';
@@ -54,6 +55,12 @@ class AppDatabase extends _$AppDatabase {
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
+    onCreate: (Migrator m) async {
+      // create all database tables
+      await m.createAll();
+      // insert initial data
+      await DatabaseSeeder(this).seed();
+    },
     beforeOpen: (details) async {
       await customStatement('PRAGMA foreign_keys = ON');
     },

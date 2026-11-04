@@ -1,5 +1,3 @@
-import 'package:drift/drift.dart';
-
 import 'app_database.dart';
 
 class DatabaseSeeder {
@@ -8,13 +6,11 @@ class DatabaseSeeder {
   DatabaseSeeder(this.db);
 
   Future<void> seed() async {
-    await db.transaction(() async {
       final usdId = await _seedCurrencies();
       await _seedTransactionTypes();
       await _seedCategories();
       await _seedSettings(usdId);
       await _seedWallet();
-    });
   }
 
   Future<int> _seedCurrencies() async {
