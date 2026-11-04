@@ -28,4 +28,9 @@ class AppSettingsDao extends DatabaseAccessor<AppDatabase> with _$AppSettingsDao
   Future<int> insertSettings(AppSettingsCompanion settings) {
     return into(appSettings).insert(settings);
   }
+
+  Future<int?> getSelectedCurrencyId() async {
+    final settings = await getSettings();
+    return settings?.selectedCurrencyId;
+  }
 }
