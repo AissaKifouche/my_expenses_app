@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 
 // 1. Currency Model
 class Currency {
+  final int id;
   final String code;
   final String name;
   final String symbol;
   final String flag;
 
   const Currency({
+    required this.id,
     required this.code,
     required this.name,
     required this.symbol,
@@ -15,26 +17,18 @@ class Currency {
   });
 }
 
-// 2. Currencies List
-const List<Currency> currencies = [
-  Currency(code: 'USD', name: 'US Dollar', symbol: '\$', flag: '🇺🇸'),
-  Currency(code: 'EUR', name: 'Euro', symbol: '€', flag: '🇪🇺'),
-  Currency(code: 'DZD', name: 'Algerian Dinar', symbol: 'DA', flag: '🇩🇿'),
-  Currency(code: 'GBP', name: 'British Pound', symbol: '£', flag: '🇬🇧'),
-  Currency(code: 'CAD', name: 'Canadian Dollar', symbol: 'CA\$', flag: '🇨🇦'),
-  Currency(code: 'SAR', name: 'Saudi Riyal', symbol: 'SR', flag: '🇸🇦'),
-  Currency(code: 'AED', name: 'UAE Dirham', symbol: 'AED', flag: '🇦🇪'),
-];
 
 // 3. Container Dropdown Selector
 class CurrencyContainerPicker extends StatelessWidget {
   final Currency selectedCurrency;
+  final List<Currency> currencies;
   final ValueChanged<Currency> onCurrencySelected;
 
   const CurrencyContainerPicker({
     super.key,
     required this.selectedCurrency,
     required this.onCurrencySelected,
+    required this.currencies,
   });
 
   @override
