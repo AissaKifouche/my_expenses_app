@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 
 import '../app_database.dart';
 import '../tables/currencies.dart';
+import '../../widgets/currency.dart' as c;
 
 part 'currency_dao.g.dart';
 
@@ -9,17 +10,18 @@ part 'currency_dao.g.dart';
 class CurrencyDao extends DatabaseAccessor<AppDatabase> with _$CurrencyDaoMixin {
   CurrencyDao(super.db);
 
-  //a function to select all currencies in the database
-  Future<List<Currency>> getCurrencies(){
-    return select(currencies).get();
-  }
 
   // a function to select a currency by id
-  Future<Currency?> getCurrencyById(int id) {
+  Future<Currency?> getCurrencyById(int id)  {
     final query = select(currencies)
       ..where((c) => c.id.equals(id));
 
     return query.getSingleOrNull();
+  }
+
+  Future<c.Currency?> getCurrencyModelById (int id,) async {
+    final row = await getCurrencyById(id);
+    return row == null ? null : _toCurrency(row);
   }
 
   //a function to insert into the currencies table
@@ -39,5 +41,23 @@ class CurrencyDao extends DatabaseAccessor<AppDatabase> with _$CurrencyDaoMixin 
     final count = await (delete(currencies)..where((t) => t.id.equals(id))).go();
 
     return count > 0;
+  }
+
+  //a method to return database rows as currency instances (list)
+  Future<List<c.Currency>> getCurrencies() async {
+    final rows = await select(currencies).get();
+    
+    return rows.map((row) => _toCurrency(row)).toList();
+  }
+
+  //convert a Drift Currency row into the app Currency model
+  c.Currency _toCurrency(Currency row) {
+    return c.Currency(
+      id: row.id,
+      code: row.code,
+      name: row.name,
+      flag: row.flag,
+      symbol: row.symbol
+    );
   }
 }
