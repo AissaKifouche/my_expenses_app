@@ -1,9 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:my_expenses/main_shell.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
+import 'database/app_database.dart';
 
-void main() {
-  runApp(const MyApp());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  //create one database instance
+  final database = AppDatabase();
+
+  //open database and trigger the first initialization if needed
+  //forcing drift to open the database
+  await database.customSelect('SELECT 1').get();
+
+  runApp(
+    Provider<AppDatabase>(
+      create: (_) => database,
+      dispose: (_, db) => db.close(),
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
