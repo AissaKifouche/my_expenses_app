@@ -10,9 +10,7 @@ Future<void> main() async {
   //create one database instance
   final database = AppDatabase();
 
-  //open database and trigger the first initialization if needed
-  //forcing drift to open the database
-  await database.customSelect('SELECT 1').get();
+
 
   runApp(
     Provider<AppDatabase>(
