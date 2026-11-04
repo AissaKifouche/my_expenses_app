@@ -8,7 +8,7 @@ part 'transaction_type_dao.g.dart';
 @DriftAccessor(tables: [TransactionTypes])
 class TransactionTypeDao extends DatabaseAccessor<AppDatabase>
     with _$TransactionTypeDaoMixin {
-  TransactionTypeDao(AppDatabase db) : super(db);
+  TransactionTypeDao(super.db);
 
   Future<List<TransactionType>> getAll() {
     return select(transactionTypes).get();
