@@ -105,7 +105,7 @@ class _SettingsPageState extends State<SettingsPage> {
                               setState(() {
                                 widget.appData.currency = currency;
                               });
-                            }
+                            }, currencies: widget.appData.currencies,
                         ),
 
                       ],
