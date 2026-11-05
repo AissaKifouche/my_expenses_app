@@ -60,3 +60,22 @@ class Transaction {
     );
   }
 }
+
+//a draft class to use it when creating and inserting transactions ( no id field)
+class TransactionDraft {
+  final String title;
+  final TransactionType transactionType;
+  final Category category;
+  final DateTime dateTime;
+  final double amount;
+  final String? note;
+
+  TransactionDraft({
+    required this.title,
+    required this.transactionType,
+    required this.category,
+    required this.dateTime,
+    required this.amount,
+    this.note,
+  });
+}
