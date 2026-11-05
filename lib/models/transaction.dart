@@ -1,5 +1,3 @@
-import 'package:uuid/uuid.dart';
-
 enum TransactionType {income, expense}
 
 enum Category {
@@ -14,7 +12,7 @@ enum Category {
 }
 
 class Transaction {
-  final String id;
+  final int id;
   final String title;
   final TransactionType transactionType;
   final Category category;
@@ -23,13 +21,14 @@ class Transaction {
   final String? note;
 
   Transaction({
+    required this.id,
     required this.title,
     required this.transactionType,
     required this.category,
     required this.dateTime,
     required this.amount,
     this.note,
-}): id = Uuid().v4();
+});
 
   // private constructor used only by copyWith, to preserve the original id
   Transaction._({
