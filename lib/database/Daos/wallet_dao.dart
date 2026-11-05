@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 
 import '../app_database.dart';
 import '../tables/wallets.dart';
+import '../../models/wallet.dart' as model;
 
 part 'wallet_dao.g.dart';
 
@@ -10,12 +11,9 @@ class WalletDao extends DatabaseAccessor<AppDatabase>
     with _$WalletDaoMixin {
   WalletDao(super.db);
 
-  Future<List<Wallet>> getAll() {
-    return select(wallets).get();
-  }
-
-  Future<Wallet?> getWallet() {
-    return select(wallets).getSingleOrNull();
+  Future<model.Wallet?> getWallet() async {
+    final row = await select(wallets).getSingleOrNull();
+    return row == null ? null : _toWalletModel(row);
   }
 
   Future<int> insertWallet(WalletsCompanion wallet) {
@@ -27,7 +25,7 @@ class WalletDao extends DatabaseAccessor<AppDatabase>
       WalletsCompanion wallet,
       ) async {
     final count = await (update(wallets)
-      ..where((wallet) => wallet.id.equals(id)))
+      ..where((w) => w.id.equals(id)))
         .write(wallet);
 
     return count > 0;
@@ -42,42 +40,33 @@ class WalletDao extends DatabaseAccessor<AppDatabase>
   }
 
   Future<bool> addToWallet(double amount) async {
-    final mainWallet = await getWallet();
+    final wallet = await getWallet();
 
-    if (mainWallet == null) {
-      return false;
-    }
+    if (wallet == null) return false;
 
-    final newBalance = mainWallet.balance + amount;
-
-    final count = await (update(wallets)
-      ..where((wallet) => wallet.id.equals(mainWallet.id)))
-        .write(
+    return updateWallet(
+      wallet.id,
       WalletsCompanion(
-        balance: Value(newBalance),
+        balance: Value(wallet.balance + amount),
       ),
     );
-
-    return count > 0;
   }
 
   Future<bool> subtractFromWallet(double amount) async {
-    final mainWallet = await getWallet();
+    final wallet = await getWallet();
 
-    if (mainWallet == null) {
-      return false;
-    }
+    if (wallet == null) return false;
 
-    final newBalance = mainWallet.balance - amount;
+    return updateWallet(wallet.id, WalletsCompanion(
+      balance: Value(wallet.balance - amount),
+    ));
+  }
 
-    final count = await (update(wallets)
-      ..where((wallet) => wallet.id.equals(mainWallet.id)))
-        .write(
-      WalletsCompanion(
-        balance: Value(newBalance),
-      ),
+  model.Wallet _toWalletModel(Wallet row) {
+    return model.Wallet(
+        id: row.id,
+        name: row.name,
+        balance: row.balance,
     );
-
-    return count > 0;
   }
 }
