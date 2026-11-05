@@ -7,6 +7,9 @@ import '../database/app_database.dart' as ad;
 import '../database/Daos/currency_dao.dart' as cd;
 import '../database/Daos/app_settings_dao.dart' as asd;
 import '../database/Daos/wallet_dao.dart' as wd;
+import '../database/Daos/transaction_dao.dart' as td;
+import 'package:drift/drift.dart';
+import '../database/tables/wallets.dart';
 
 class AppData {
 
@@ -15,11 +18,13 @@ class AppData {
   late final cd.CurrencyDao _currencyDao;
   late final asd.AppSettingsDao _appSettingsDao;
   late final wd.WalletDao _walletDao;
+  late final td.TransactionDao _transactionDao;
 
   AppData(this.database) {
     _currencyDao = cd.CurrencyDao(database);
     _appSettingsDao = asd.AppSettingsDao(database);
     _walletDao = wd.WalletDao(database);
+    _transactionDao = td.TransactionDao(database);
   }
 
 
@@ -61,15 +66,55 @@ class AppData {
 
 
 
-  void addTransaction(Transaction transaction){
-    transactions.insert(0, transaction);
-    transaction.transactionType == TransactionType.income ? wallet.balance += transaction.amount : wallet.balance -= transaction.amount;
-    if (transaction.transactionType == TransactionType.expense){
-      int index = budgets.indexWhere((budget) => budget.month == transaction.dateTime.month && budget.year == transaction.dateTime.year);
-      if(index != -1 ){
-        budgets[index].addExpense(transaction.amount);
+  Future<Transaction> addTransaction(TransactionDraft draft) async {
+    final result = await database.transaction(() async {
+      final currentWallet = await _walletDao.getWallet();
+
+      if (currentWallet == null ){
+        throw StateError("Main wallet was not found.");
+      }
+
+      final id = await _transactionDao.insertTransaction(draft);
+
+      final savedTransaction = await _transactionDao.getTransactionById(id);
+      if(savedTransaction == null) {
+        throw StateError("Could not retrieve the inserted transaction.");
+      }
+
+      final delta = savedTransaction.transactionType == TransactionType.income
+        ? savedTransaction.amount : -savedTransaction.amount;
+
+      final newBalance = currentWallet.balance + delta;
+
+      final updated = await _walletDao.updateWallet(
+          id,
+          ad.WalletsCompanion(
+            balance: Value(newBalance),
+          ),
+      );
+
+      if(!updated) {
+        throw StateError('Could not update wallet balance.');
+      }
+
+      return (transaction: savedTransaction, balance: newBalance);
+    });
+
+    wallet.balance = result.balance;
+    transactions.insert(0, result.transaction);
+
+    if (result.transaction.transactionType == TransactionType.expense) {
+      final index = budgets.indexWhere(
+          (b) =>
+              b.month == result.transaction.dateTime.month && b.year == result.transaction.dateTime.year,
+      );
+
+      if(index != -1) {
+        budgets[index].addExpense(result.transaction.amount);
       }
     }
+
+    return result.transaction;
   }
 
   void deleteTransaction(String id){
