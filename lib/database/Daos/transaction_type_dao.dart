@@ -25,4 +25,8 @@ class TransactionTypeDao extends DatabaseAccessor<AppDatabase>
       ) {
     return into(transactionTypes).insert(transactionType);
   }
+
+  Future<TransactionType?> getByName(String name) {
+    return (select(transactionTypes)..where((t) => t.name.equals(name))).getSingleOrNull();
+  }
 }

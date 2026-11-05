@@ -42,4 +42,8 @@ class CategoryDao extends DatabaseAccessor<AppDatabase>
 
     return count > 0;
   }
+
+  Future<Category?> getByName(String name) {
+    return (select(categories)..where((c) => c.name.equals(name))).getSingleOrNull();
+  }
 }
