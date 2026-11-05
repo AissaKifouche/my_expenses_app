@@ -6,6 +6,7 @@ import 'package:my_expenses/widgets/currency.dart';
 import '../database/app_database.dart' as ad;
 import '../database/Daos/currency_dao.dart' as cd;
 import '../database/Daos/app_settings_dao.dart' as asd;
+import '../database/Daos/wallet_dao.dart' as wd;
 
 class AppData {
 
@@ -13,17 +14,16 @@ class AppData {
 
   late final cd.CurrencyDao _currencyDao;
   late final asd.AppSettingsDao _appSettingsDao;
+  late final wd.WalletDao _walletDao;
 
   AppData(this.database) {
     _currencyDao = cd.CurrencyDao(database);
     _appSettingsDao = asd.AppSettingsDao(database);
+    _walletDao = wd.WalletDao(database);
   }
 
 
-  Wallet wallet = Wallet(
-    name: "Main Wallet",
-    balance: 0,
-  );
+  late Wallet wallet;
 
   List<Currency> currencies = [];
   late Currency currency;
@@ -44,6 +44,7 @@ class AppData {
 
     currency = selectedCurrency.first;
     isInitialized = true;
+    wallet = (await _walletDao.getWallet()) ?? (throw StateError("Main wallet was not found"));
   }
 
   Future<void> changeCurrency(Currency newCurrency) async {
