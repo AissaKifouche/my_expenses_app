@@ -3,17 +3,60 @@ import 'package:my_expenses/models/monthly_budget.dart';
 import 'package:my_expenses/models/transaction.dart';
 import 'package:my_expenses/models/wallet.dart';
 import 'package:my_expenses/widgets/currency.dart';
+import '../database/app_database.dart' as ad;
+import '../database/Daos/currency_dao.dart' as cd;
+import '../database/Daos/app_settings_dao.dart' as asd;
 
 class AppData {
+
+  final ad.AppDatabase database;
+
+  late final cd.CurrencyDao _currencyDao;
+  late final asd.AppSettingsDao _appSettingsDao;
+
+  AppData(this.database) {
+    _currencyDao = cd.CurrencyDao(database);
+    _appSettingsDao = asd.AppSettingsDao(database);
+  }
+
+
   Wallet wallet = Wallet(
     name: "Main Wallet",
     balance: 0,
   );
 
-  Currency currency = currencies[0];
+  List<Currency> currencies = [];
+  late Currency currency;
+
   List<Transaction> transactions = [];
   List<MonthlyBudget> budgets = [];
   List<Goal> goals = [];
+
+  bool isInitialized = false;
+
+  Future<void> initialize() async {
+    currencies = await _currencyDao.getCurrencies();
+
+    final selectedCurrencyId = await _appSettingsDao.getSelectedCurrencyId();
+    final selectedCurrency = currencies.where((c) => c.id == selectedCurrencyId);
+
+    if (selectedCurrency.isEmpty) throw StateError("The selected currency was not found");
+
+    currency = selectedCurrency.first;
+    isInitialized = true;
+  }
+
+  Future<void> changeCurrency(Currency newCurrency) async {
+    if(!currencies.any((c) => c.id == newCurrency.id)) {
+      throw ArgumentError("Currency does not exist in the available list");
+    }
+
+    final updated = await _appSettingsDao.setSelectedCurrency(newCurrency.id);
+    if (!updated) {
+      throw StateError("Could not update the selected currency");
+    }
+    currency = newCurrency;
+  }
 
 
 
