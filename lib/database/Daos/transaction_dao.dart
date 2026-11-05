@@ -61,7 +61,7 @@ class TransactionDao extends DatabaseAccessor<AppDatabase> with _$TransactionDao
   }
   
   //a function to insert a new transaction
-  Future<int> insertTransaction(model.Transaction transaction) async {
+  Future<int> insertTransaction(model.TransactionDraft transaction) async {
 
     final typeId = await _getTypeId(transaction.transactionType);
     final categoryId = await _getCategoryId(transaction.category);
