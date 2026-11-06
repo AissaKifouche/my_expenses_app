@@ -167,50 +167,83 @@ class AppData {
     return true;
   }
 
-  void editTransaction(Transaction updated){
-    int index = transactions.indexWhere((transaction) => transaction.id == updated.id);
-    if (index != -1){
-      Transaction oldTransaction = transactions[index];
-      double oldAmount = oldTransaction.amount;
-      double newAmount = updated.amount;
-      transactions[index] = updated;
-      int j = budgets.indexWhere((test) => test.year == oldTransaction.dateTime.year && test.month == oldTransaction.dateTime.month);
-      int i = budgets.indexWhere((b) => b.month == updated.dateTime.month && b.year == updated.dateTime.year);
+  Future<bool> editTransaction(Transaction updatedTransaction) async {
+    final index = transactions.indexWhere(
+          (t) => t.id == updatedTransaction.id,
+    );
 
-      //case both are incomes
-      if(oldTransaction.transactionType == TransactionType.income && updated.transactionType == TransactionType.income){
-        wallet.balance += newAmount - oldAmount;
+    if (index == -1) return false;
+
+    final oldTransaction = transactions[index];
+
+    final newBalance = await database.transaction(() async {
+      final currentWallet = await _walletDao.getWallet();
+
+      if (currentWallet == null) {
+        throw StateError('Main wallet was not found.');
       }
 
-      //case both are expenses
-      else if(oldTransaction.transactionType == TransactionType.expense && updated.transactionType == TransactionType.expense){
-        wallet.balance += oldAmount - newAmount;
-        if (i != -1){
-          budgets[i].addExpense(newAmount);
-        }
+      final updated = await _transactionDao.updateTransaction(
+        updatedTransaction.id,
+        updatedTransaction,
+      );
 
-        if (j != -1){
-          budgets[j].deleteExpense(oldAmount);
-        }
+      if (!updated) return null;
 
+      double effect(Transaction t) {
+        return t.transactionType == TransactionType.income
+            ? t.amount
+            : -t.amount;
       }
 
-      //case old is income new is expense
-      else if(oldTransaction.transactionType == TransactionType.income && updated.transactionType == TransactionType.expense){
-        wallet.balance -= oldAmount + newAmount;
-        if (i != -1){
-          budgets[i].addExpense(newAmount);
-        }
+      final balance = currentWallet.balance +
+          effect(updatedTransaction) -
+          effect(oldTransaction);
+
+      final walletUpdated = await _walletDao.updateWallet(
+        currentWallet.id,
+        ad.WalletsCompanion(balance: Value(balance)),
+      );
+
+      if (!walletUpdated) {
+        throw StateError('Could not update wallet balance.');
       }
 
-      //case old is expense new is income
-      else {
-        wallet.balance += oldAmount + newAmount;
-        if (j != -1){
-          budgets[j].deleteExpense(oldAmount);
-        }
+      return balance;
+    });
+
+    if (newBalance == null) return false;
+
+    wallet.balance = newBalance;
+
+    // Reverse the old expense from its original month.
+    if (oldTransaction.transactionType == TransactionType.expense) {
+      final oldBudgetIndex = budgets.indexWhere(
+            (b) =>
+        b.year == oldTransaction.dateTime.year &&
+            b.month == oldTransaction.dateTime.month,
+      );
+
+      if (oldBudgetIndex != -1) {
+        budgets[oldBudgetIndex].deleteExpense(oldTransaction.amount);
       }
     }
+
+    // Apply the new expense to its new month.
+    if (updatedTransaction.transactionType == TransactionType.expense) {
+      final newBudgetIndex = budgets.indexWhere(
+            (b) =>
+        b.year == updatedTransaction.dateTime.year &&
+            b.month == updatedTransaction.dateTime.month,
+      );
+
+      if (newBudgetIndex != -1) {
+        budgets[newBudgetIndex].addExpense(updatedTransaction.amount);
+      }
+    }
+
+    transactions[index] = updatedTransaction;
+    return true;
   }
 
 
