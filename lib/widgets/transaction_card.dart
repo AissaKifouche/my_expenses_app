@@ -8,7 +8,7 @@ import 'package:my_expenses/screens/transaction_details.dart';
 class TransactionCard extends StatelessWidget {
   final AppData appData;
   final Transaction transaction;
-  final Function(String) onDelete;
+  final Function(int) onDelete;
   final Function(Transaction) onUpdate;
 
   const TransactionCard({
