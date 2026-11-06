@@ -117,18 +117,54 @@ class AppData {
     return result.transaction;
   }
 
-  void deleteTransaction(String id){
-    int index = transactions.indexWhere((transaction) => transaction.id == id);
-    if (transactions[index].transactionType == TransactionType.expense){
-      int i = budgets.indexWhere((budget) => budget.month == transactions[index].dateTime.month && budget.year == transactions[index].dateTime.year);
-      if (i != -1){
-        budgets[i].deleteExpense(transactions[index].amount);
+  Future<bool> deleteTransaction(int id) async {
+    final index = transactions.indexWhere((t) => t.id == id);
+
+    if (index == -1) return false;
+
+    final oldTransaction = transactions[index];
+
+    final newBalance = await database.transaction(() async {
+      final currentWallet = await _walletDao.getWallet();
+      if (currentWallet == null) {
+        throw StateError('Main wallet was not found.');
+      }
+
+      final deleted = await _transactionDao.deleteTransaction(id);
+      if(!deleted) return null;
+
+      final delta = oldTransaction.transactionType == TransactionType.income ?
+          -oldTransaction.amount
+          : oldTransaction.amount;
+
+      final balance = currentWallet.balance + delta;
+
+      final updated = await _walletDao.updateWallet(
+          currentWallet.id,
+          ad.WalletsCompanion(balance: Value(balance),),
+      );
+
+      if (!updated) {
+        throw StateError('Could not update wallet balance.');
+      }
+
+      return balance;
+    });
+
+    if (newBalance == null) return false;
+
+    wallet.balance = newBalance;
+    if(oldTransaction.transactionType == TransactionType.expense){
+      final budgetIndex = budgets.indexWhere(
+        (b) => b.year == oldTransaction.dateTime.year && b.month == oldTransaction.dateTime.month,
+      );
+      if(budgetIndex != -1){
+        budgets[budgetIndex].deleteExpense(oldTransaction.amount);
       }
     }
-    transactions[index].transactionType == TransactionType.income ?
-        wallet.balance -= transactions[index].amount
-        : wallet.balance += transactions[index].amount;
+
     transactions.removeAt(index);
+    return true;
   }
 
   void editTransaction(Transaction updated){
