@@ -1,38 +1,45 @@
-import 'package:uuid/uuid.dart';
-
 class Goal {
-  final String id;
+  final int id;
   final String title;
   final double targetedAmount;
   double savedAmount;
 
   Goal({
+    required this.id,
     required this.title,
     required this.targetedAmount,
     this.savedAmount = 0,
-}) : id = Uuid().v4();
+});
 
   double get remaining => targetedAmount - savedAmount;
   double get progress => savedAmount / targetedAmount;
 
 
-  Goal._({
-    required this.id,
-    required this.title,
-    required this.targetedAmount,
-    required this.savedAmount ,
-});
 
   Goal copyWith({
     String? title,
     double? targetedAmount,
+    double? savedAmount,
 }){
-    return Goal._(
+    return Goal(
       id: id,
       title: title ?? this.title,
       targetedAmount: targetedAmount ?? this.targetedAmount,
-      savedAmount: savedAmount,
+      savedAmount: savedAmount ?? this.savedAmount,
     );
   }
 
+}
+
+// a new goal model used in insertion ( no id field)
+class GoalDraft {
+  final String title;
+  final double targetedAmount;
+  final double savedAmount;
+
+  GoalDraft({
+    required this.title,
+    required this.targetedAmount,
+    this.savedAmount = 0,
+  });
 }
