@@ -9,7 +9,7 @@ import 'package:my_expenses/screens/add_transaction_sheet.dart';
 class TransactionDetailPage extends StatelessWidget {
   final AppData appData;
   final Transaction transaction;
-  final Function(String) onDelete;
+  final Function(int) onDelete;
   final Function(Transaction) onUpdate;
 
   const TransactionDetailPage({super.key,required this.appData, required this.transaction, required this.onDelete, required this.onUpdate});
