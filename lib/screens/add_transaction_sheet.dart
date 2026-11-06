@@ -103,38 +103,53 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
     });
   }
 
-  void _save() {
+  Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
 
     final title = _titleController.text.trim();
     final amount = double.parse(_amountController.text.trim());
-    final note = _noteController.text.trim().isEmpty ? null : _noteController.text.trim();
+    final note = _noteController.text.trim().isEmpty
+        ? null
+        : _noteController.text.trim();
 
-    final Transaction result;
+    try {
+      if (isEditing) {
+        final updated = widget.initialTransaction!.copyWith(
+          title: title,
+          transactionType: _type,
+          category: _category,
+          dateTime: _dateTime,
+          amount: amount,
+          note: note,
+        );
 
-    if (isEditing) {
-      // 3. Use copyWith to retain IDs/metadata while updating modified fields
-      result = widget.initialTransaction!.copyWith(
-        title: title,
-        transactionType: _type,
-        category: _category,
-        dateTime: _dateTime,
-        amount: amount,
-        note: note,
-      );
-    } else {
-      // Create new transaction instance
-      result = Transaction(
-        title: title,
-        transactionType: _type,
-        category: _category,
-        dateTime: _dateTime,
-        amount: amount,
-        note: note,
+        await widget.appData.editTransaction(updated);
+
+        if (!mounted) return;
+        Navigator.of(context).pop(updated);
+      } else {
+        final draft = TransactionDraft(
+          title: title,
+          transactionType: _type,
+          category: _category,
+          dateTime: _dateTime,
+          amount: amount,
+          note: note,
+        );
+
+        final savedTransaction =
+        await widget.appData.addTransaction(draft);
+
+        if (!mounted) return;
+        Navigator.of(context).pop(savedTransaction);
+      }
+    } catch (error) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Could not save transaction: $error')),
       );
     }
-
-    Navigator.of(context).pop(result);
   }
 
   @override
