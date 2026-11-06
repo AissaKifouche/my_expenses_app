@@ -49,6 +49,7 @@ class AppData {
     currency = selectedCurrency.first;
     isInitialized = true;
     wallet = (await _walletDao.getWallet()) ?? (throw StateError("Main wallet was not found"));
+    transactions = await _transactionDao.getAll();
   }
 
   Future<void> changeCurrency(Currency newCurrency) async {
@@ -86,7 +87,7 @@ class AppData {
       final newBalance = currentWallet.balance + delta;
 
       final updated = await _walletDao.updateWallet(
-          id,
+          currentWallet.id,
           ad.WalletsCompanion(
             balance: Value(newBalance),
           ),
