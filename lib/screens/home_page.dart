@@ -52,10 +52,8 @@ class _HomePageState extends State<HomePage> {
               builder: (context) => AddTransactionSheet(appData: widget.appData),
             );
 
-            if (newTransaction != null) {
-              setState(() {
-                widget.appData.addTransaction(newTransaction);
-              });
+            if (newTransaction != null && mounted) {
+              setState(() {});
             }
           },
           backgroundColor: const Color(0xFF2F948D),
@@ -159,15 +157,19 @@ class _HomePageState extends State<HomePage> {
                                   child: TransactionCard(
                                     appData: widget.appData,
                                     transaction: transaction,
-                                    onDelete: (id) {
-                                      setState(() {
-                                        widget.appData.deleteTransaction(id);
-                                      });
+                                    onDelete: (id) async {
+                                      final deleted = await widget.appData.deleteTransaction(id);
+                                      if (!mounted) return;
+                                      if (deleted) {
+                                        setState(() {});
+                                      }
                                     },
-                                    onUpdate: (updated) {
-                                      setState(() {
-                                        widget.appData.editTransaction(updated);
-                                      });
+                                    onUpdate: (updated) async {
+                                      final success = await widget.appData.editTransaction(updated);
+                                      if (!mounted) return;
+                                      if (success) {
+                                        setState(() {});
+                                      }
                                     },
                                   ),
                                 );
