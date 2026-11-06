@@ -9,7 +9,6 @@ import '../database/Daos/app_settings_dao.dart' as asd;
 import '../database/Daos/wallet_dao.dart' as wd;
 import '../database/Daos/transaction_dao.dart' as td;
 import 'package:drift/drift.dart';
-import '../database/tables/wallets.dart';
 
 class AppData {
 
