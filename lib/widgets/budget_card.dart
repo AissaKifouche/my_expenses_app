@@ -15,6 +15,19 @@ class BudgetCard extends StatefulWidget {
 }
 
 class _BudgetCardState extends State<BudgetCard> {
+
+  Future<void> _addBudget() async {
+    final draft = await showSetBudgetDialog(context, widget.appData);
+
+    if (draft == null || !mounted) return;
+
+    await widget.appData.addBudget(draft);
+
+    if (!mounted) return;
+
+    setState(() {});
+  }
+
   final DateTime now = DateTime.now();
 
   @override
@@ -52,14 +65,7 @@ class _BudgetCardState extends State<BudgetCard> {
 
     return InkWell(
       borderRadius: BorderRadius.circular(20.r),
-      onTap: () async {
-        final updated = await showSetBudgetDialog(context, widget.appData);
-        if (updated != null) {
-          setState(() {
-            widget.appData.addBudget(updated);
-          });
-        }
-      },
+      onTap: _addBudget,
       child: Container(
         width: double.infinity,
         decoration: _cardDecoration,
@@ -150,14 +156,7 @@ class _BudgetCardState extends State<BudgetCard> {
   Widget _noBudgetExist() {
     return InkWell(
       borderRadius: BorderRadius.circular(20.r),
-      onTap: () async {
-        final b = await showSetBudgetDialog(context, widget.appData);
-        if (b != null) {
-          setState(() {
-            widget.appData.addBudget(b);
-          });
-        }
-      },
+      onTap: _addBudget,
       child: Container(
         width: double.infinity,
         decoration: _cardDecoration,
