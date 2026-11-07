@@ -11,7 +11,7 @@ Future<MonthlyBudgetDraft?> showSetBudgetDialog(BuildContext context, AppData ap
   final now = DateTime.now();
 
   try {
-    return showDialog<MonthlyBudgetDraft>(
+    return await showDialog<MonthlyBudgetDraft>(
       context: context,
       builder: (context) {
         return AlertDialog(
