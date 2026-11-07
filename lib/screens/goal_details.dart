@@ -18,20 +18,28 @@ class GoalDetailPage extends StatefulWidget {
 }
 
 class _GoalDetailPageState extends State<GoalDetailPage> {
-  bool get _isComplete => widget.goal.savedAmount / widget.goal.targetedAmount >= 1;
+  bool get _isComplete => _currentGoal.savedAmount / _currentGoal.targetedAmount >= 1;
+
+  Goal get _currentGoal {
+    return widget.appData.goals.firstWhere(
+          (g) => g.id == widget.goal.id,
+    );
+  }
 
   Color _progressColor() {
-    if (widget.goal.savedAmount >= 6 / 7 * widget.goal.targetedAmount) return const Color(0xFF002017);
-    if (widget.goal.savedAmount >= 5 / 7 * widget.goal.targetedAmount) return const Color(0xFF004231);
-    if (widget.goal.savedAmount >= 4 / 7 * widget.goal.targetedAmount) return const Color(0xFF00674F);
-    if (widget.goal.savedAmount >= 3 / 7 * widget.goal.targetedAmount) return const Color(0xFF008F6F);
-    if (widget.goal.savedAmount >= 2 / 7 * widget.goal.targetedAmount) return const Color(0xFF00B890);
-    if (widget.goal.savedAmount >= 1 / 7 * widget.goal.targetedAmount) return const Color(0xFF00E4B2);
+    if (_currentGoal.savedAmount >= 6 / 7 * _currentGoal.targetedAmount) return const Color(0xFF002017);
+    if (_currentGoal.savedAmount >= 5 / 7 * _currentGoal.targetedAmount) return const Color(0xFF004231);
+    if (_currentGoal.savedAmount >= 4 / 7 * _currentGoal.targetedAmount) return const Color(0xFF00674F);
+    if (_currentGoal.savedAmount >= 3 / 7 * _currentGoal.targetedAmount) return const Color(0xFF008F6F);
+    if (_currentGoal.savedAmount >= 2 / 7 * _currentGoal.targetedAmount) return const Color(0xFF00B890);
+    if (_currentGoal.savedAmount >= 1 / 7 * _currentGoal.targetedAmount) return const Color(0xFF00E4B2);
     return const Color(0xFFBAFFE5);
   }
 
   @override
   Widget build(BuildContext context) {
+    final goal = _currentGoal;
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: CustomScrollView(
@@ -69,12 +77,12 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                   ),
                   SizedBox(height: 28.h),
                   Text(
-                    widget.goal.title,
+                    goal.title,
                     style: TextStyle(color: Colors.white, fontSize: 22.sp, fontWeight: FontWeight.w600),
                   ),
                   SizedBox(height: 6.h),
                   Text(
-                    '${widget.appData.currency.symbol}${widget.goal.savedAmount.toStringAsFixed(2)} of ${widget.appData.currency.symbol}${widget.goal.targetedAmount.toStringAsFixed(2)}',
+                    '${widget.appData.currency.symbol}${goal.savedAmount.toStringAsFixed(2)} of ${widget.appData.currency.symbol}${goal.targetedAmount.toStringAsFixed(2)}',
                     style: TextStyle(color: Colors.white70, fontSize: 15.sp),
                   ),
                 ],
@@ -93,7 +101,7 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                     child: _isComplete
                         ? Container(height: 14.h, color: const Color(0xFF00E4B2))
                         : LinearProgressIndicator(
-                      value: widget.goal.savedAmount / widget.goal.targetedAmount,
+                      value: goal.savedAmount / goal.targetedAmount,
                       minHeight: 14.h,
                       backgroundColor: const Color(0xFFD9D9D9),
                       color: _progressColor(),
@@ -103,7 +111,7 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                   Text(
                     _isComplete
                         ? 'Goal completed 🎉'
-                        : '${((widget.goal.savedAmount / widget.goal.targetedAmount) * 100).clamp(0, 100).toStringAsFixed(0)}% saved',
+                        : '${((goal.savedAmount / goal.targetedAmount) * 100).clamp(0, 100).toStringAsFixed(0)}% saved',
                     style: TextStyle(fontSize: 13.sp, color: Colors.black54),
                   ),
                   SizedBox(height: 24.h),
@@ -118,11 +126,11 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                     ),
                     child: Column(
                       children: [
-                        _DetailRow(label: 'Saved', value: '${widget.appData.currency.symbol}${widget.goal.savedAmount.toStringAsFixed(2)}'),
+                        _DetailRow(label: 'Saved', value: '${widget.appData.currency.symbol}${goal.savedAmount.toStringAsFixed(2)}'),
                         const Divider(height: 1, color: Color(0xFFE8E8E8)),
-                        _DetailRow(label: 'Target', value: '${widget.appData.currency.symbol}${widget.goal.targetedAmount.toStringAsFixed(2)}'),
+                        _DetailRow(label: 'Target', value: '${widget.appData.currency.symbol}${goal.targetedAmount.toStringAsFixed(2)}'),
                         const Divider(height: 1, color: Color(0xFFE8E8E8)),
-                        _DetailRow(label: 'Remaining', value: '${widget.appData.currency.symbol}${widget.goal.remaining.toStringAsFixed(2)}'),
+                        _DetailRow(label: 'Remaining', value: '${widget.appData.currency.symbol}${goal.remaining.toStringAsFixed(2)}'),
                       ],
                     ),
                   ),
@@ -136,11 +144,24 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                       Expanded(
                         child: ElevatedButton.icon(
                           onPressed: () async {
-                            double? amount = await showAddOrRemoveDialog(context, widget.appData, true, widget.goal);
-                            if (amount != null){
-                              setState(() {
-                                widget.appData.addMoneyToGoal(widget.goal.id, amount);
-                              });
+                            final amount = await showAddOrRemoveDialog(
+                              context,
+                              widget.appData,
+                              true,
+                              _currentGoal,
+                            );
+                            if (amount == null || !mounted) return;
+                            final success = await widget.appData.addMoneyToGoal(
+                              widget.goal.id,
+                              amount,
+                            );
+                            if (!mounted) return;
+                            if (success) {
+                              setState(() {});
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Could not add money to this goal.')),
+                              );
                             }
                           },
                           icon: const Icon(Icons.add_rounded, size: 18),
@@ -160,11 +181,24 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                       Expanded(
                         child: OutlinedButton.icon(
                           onPressed: () async {
-                            double? amount = await showAddOrRemoveDialog(context, widget.appData, false, widget.goal);
-                            if (amount != null){
-                              setState(() {
-                                widget.appData.removeMoneyFromGoal(widget.goal.id, amount);
-                              });
+                            final amount = await showAddOrRemoveDialog(
+                              context,
+                              widget.appData,
+                              false,
+                              _currentGoal,
+                            );
+                            if (amount == null || !mounted) return;
+                            final success = await widget.appData.removeMoneyFromGoal(
+                              widget.goal.id,
+                              amount,
+                            );
+                            if (!mounted) return;
+                            if (success) {
+                              setState(() {});
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Could not remove money from this goal.')),
+                              );
                             }
                           },
                           icon: const Icon(Icons.remove_rounded, size: 18),
@@ -189,7 +223,7 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                       Expanded(
                         child: OutlinedButton.icon(
                           onPressed: () async {
-                            final updated = await showModalBottomSheet(
+                            final updated = await showModalBottomSheet<Goal>(
                               useSafeArea: true,
                               isScrollControlled: true,
                               context: context,
@@ -197,15 +231,25 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                                 maxHeight: MediaQuery.of(context).size.height * 0.7,
                               ),
                               builder: (context) {
-                                return AddGoalSheet(initialGoal: widget.goal, appData: widget.appData,);
-                              }
+                                return AddGoalSheet(
+                                  initialGoal: _currentGoal,
+                                  appData: widget.appData,
+                                );
+                              },
                             );
 
-                            if(updated != null){
-                              setState(() {
-                                widget.appData.editGoal(updated);
-                              });
+                            if (updated == null || !mounted) return;
+
+                            final success = await widget.appData.editGoal(updated);
+
+                            if (!mounted) return;
+
+                            if (success) {
                               Navigator.of(context).pop();
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Could not update this goal.')),
+                              );
                             }
                           },
                           icon: const Icon(Icons.edit_outlined, size: 18),
@@ -223,10 +267,18 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                       //to delete a goal
                       Expanded(
                         child: ElevatedButton.icon(
-                          onPressed: () {
-                            setState(() {
-                              widget.appData.deleteGoal(widget.goal.id);
-                            });
+                          onPressed: () async {
+                            final success = await widget.appData.deleteGoal(widget.goal.id);
+
+                            if (!mounted) return;
+
+                            if (success) {
+                              Navigator.of(context).pop();
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Could not delete this goal.')),
+                              );
+                            }
                           },
                           icon: const Icon(Icons.delete_outline_rounded, size: 18),
                           label: const Text('Delete'),
