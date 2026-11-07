@@ -9,6 +9,7 @@ import '../database/Daos/app_settings_dao.dart' as asd;
 import '../database/Daos/wallet_dao.dart' as wd;
 import '../database/Daos/transaction_dao.dart' as td;
 import '../database/Daos/goal_dao.dart' as gd;
+import '../database/Daos/monthly_budget_dao.dart' as mbd;
 import 'package:drift/drift.dart';
 
 class AppData {
@@ -20,6 +21,7 @@ class AppData {
   late final wd.WalletDao _walletDao;
   late final td.TransactionDao _transactionDao;
   late final gd.GoalDao _goalDao;
+  late final mbd.MonthlyBudgetDao _monthlyBudgetDao;
 
   AppData(this.database) {
     _currencyDao = cd.CurrencyDao(database);
@@ -27,6 +29,7 @@ class AppData {
     _walletDao = wd.WalletDao(database);
     _transactionDao = td.TransactionDao(database);
     _goalDao = gd.GoalDao(database);
+    _monthlyBudgetDao = mbd.MonthlyBudgetDao(database);
   }
 
 
@@ -54,6 +57,7 @@ class AppData {
     wallet = (await _walletDao.getWallet()) ?? (throw StateError("Main wallet was not found"));
     transactions = await _transactionDao.getAll();
     goals = await _goalDao.getGoals();
+    budgets = await _monthlyBudgetDao.getAll();
     isInitialized = true;
   }
 
@@ -85,6 +89,13 @@ class AppData {
       if(savedTransaction == null) {
         throw StateError("Could not retrieve the inserted transaction.");
       }
+      if (savedTransaction.transactionType == TransactionType.expense) {
+        await _changeBudgetSpent(
+          savedTransaction.dateTime.year,
+          savedTransaction.dateTime.month,
+          savedTransaction.amount,
+        );
+      }
 
       final delta = savedTransaction.transactionType == TransactionType.income
         ? savedTransaction.amount : -savedTransaction.amount;
@@ -109,14 +120,7 @@ class AppData {
     transactions.insert(0, result.transaction);
 
     if (result.transaction.transactionType == TransactionType.expense) {
-      final index = budgets.indexWhere(
-          (b) =>
-              b.month == result.transaction.dateTime.month && b.year == result.transaction.dateTime.year,
-      );
-
-      if(index != -1) {
-        budgets[index].addExpense(result.transaction.amount);
-      }
+      budgets = await _monthlyBudgetDao.getAll();
     }
 
     return result.transaction;
@@ -137,6 +141,14 @@ class AppData {
 
       final deleted = await _transactionDao.deleteTransaction(id);
       if(!deleted) return null;
+
+      if (oldTransaction.transactionType == TransactionType.expense) {
+        await _changeBudgetSpent(
+          oldTransaction.dateTime.year,
+          oldTransaction.dateTime.month,
+          -oldTransaction.amount,
+        );
+      }
 
       final delta = oldTransaction.transactionType == TransactionType.income ?
           -oldTransaction.amount
@@ -160,12 +172,7 @@ class AppData {
 
     wallet.balance = newBalance;
     if(oldTransaction.transactionType == TransactionType.expense){
-      final budgetIndex = budgets.indexWhere(
-        (b) => b.year == oldTransaction.dateTime.year && b.month == oldTransaction.dateTime.month,
-      );
-      if(budgetIndex != -1){
-        budgets[budgetIndex].deleteExpense(oldTransaction.amount);
-      }
+      budgets = await _monthlyBudgetDao.getAll();
     }
 
     transactions.removeAt(index);
@@ -195,6 +202,24 @@ class AppData {
 
       if (!updated) return null;
 
+      // Reverse the old expense.
+      if (oldTransaction.transactionType == TransactionType.expense) {
+        await _changeBudgetSpent(
+          oldTransaction.dateTime.year,
+          oldTransaction.dateTime.month,
+          -oldTransaction.amount,
+        );
+      }
+
+      // Apply the new expense.
+      if (updatedTransaction.transactionType == TransactionType.expense) {
+        await _changeBudgetSpent(
+          updatedTransaction.dateTime.year,
+          updatedTransaction.dateTime.month,
+          updatedTransaction.amount,
+        );
+      }
+
       double effect(Transaction t) {
         return t.transactionType == TransactionType.income
             ? t.amount
@@ -221,47 +246,81 @@ class AppData {
 
     wallet.balance = newBalance;
 
-    // Reverse the old expense from its original month.
-    if (oldTransaction.transactionType == TransactionType.expense) {
-      final oldBudgetIndex = budgets.indexWhere(
-            (b) =>
-        b.year == oldTransaction.dateTime.year &&
-            b.month == oldTransaction.dateTime.month,
-      );
-
-      if (oldBudgetIndex != -1) {
-        budgets[oldBudgetIndex].deleteExpense(oldTransaction.amount);
-      }
+    if (oldTransaction.transactionType == TransactionType.expense ||
+        updatedTransaction.transactionType == TransactionType.expense) {
+      budgets = await _monthlyBudgetDao.getAll();
     }
 
-    // Apply the new expense to its new month.
-    if (updatedTransaction.transactionType == TransactionType.expense) {
-      final newBudgetIndex = budgets.indexWhere(
-            (b) =>
-        b.year == updatedTransaction.dateTime.year &&
-            b.month == updatedTransaction.dateTime.month,
-      );
 
-      if (newBudgetIndex != -1) {
-        budgets[newBudgetIndex].addExpense(updatedTransaction.amount);
-      }
-    }
 
     transactions[index] = updatedTransaction;
     return true;
   }
 
 
-  //add a monthly budget to the list
-  void addBudget(MonthlyBudget budget){
-    budget.addExpense(
-        transactions.where((test)
-        => test.transactionType == TransactionType.expense &&
-            test.dateTime.year == budget.year &&
-            test.dateTime.month == budget.month
-        ).fold(0, (sum, transaction) => sum + transaction.amount)
+  //add a monthly budget to the database
+  Future<MonthlyBudget> addBudget(MonthlyBudgetDraft draft) async {
+    final spent = getMonthlyExpenses(draft.year, draft.month);
+
+    final savedDraft = MonthlyBudgetDraft(
+      year: draft.year,
+      month: draft.month,
+      amount: draft.amount,
+      spent: spent,
     );
-    budgets.add(budget);
+
+    final savedBudget = await database.transaction(() async {
+      final id = await _monthlyBudgetDao.insertMonthlyBudget(savedDraft);
+
+      final budget = await _monthlyBudgetDao.getMonthlyBudgetById(id);
+
+      if (budget == null) {
+        throw StateError('Could not retrieve the inserted budget.');
+      }
+
+      return budget;
+    });
+
+    budgets.add(savedBudget);
+
+    return savedBudget;
+  }
+
+  Future<bool> deleteBudget(int id) async {
+    final deleted = await _monthlyBudgetDao.deleteMonthlyBudget(id);
+
+    if (!deleted) return false;
+
+    budgets.removeWhere((budget) => budget.id == id);
+
+    return true;
+  }
+
+
+  Future<void> _changeBudgetSpent(
+      int year,
+      int month,
+      double amount,
+      ) async {
+    final budget = await _monthlyBudgetDao.getByYearMonth(year, month);
+
+    if (budget == null) return;
+
+    final newSpent = (budget.spent + amount).clamp(0.0, double.infinity);
+
+    final updatedBudget = MonthlyBudget(
+      id: budget.id,
+      year: budget.year,
+      month: budget.month,
+      amount: budget.amount,
+      spent: newSpent,
+    );
+
+    final updated = await _monthlyBudgetDao.updateMonthlyBudget(updatedBudget);
+
+    if (!updated) {
+      throw StateError('Could not update monthly budget spending.');
+    }
   }
 
 
