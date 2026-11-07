@@ -354,6 +354,10 @@ class AppData {
         return null;
       }
 
+      if (currentGoal.savedAmount + amount > currentGoal.targetedAmount) {
+        return null;
+      }
+
       final updatedGoal = Goal(
         id: currentGoal.id,
         title: currentGoal.title,
