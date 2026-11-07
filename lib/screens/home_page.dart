@@ -41,6 +41,7 @@ class _HomePageState extends State<HomePage> {
       ),
       child: Scaffold(
         floatingActionButton: FloatingActionButton(
+          heroTag: 'home_fab',
           onPressed: () async {
             final newTransaction = await showModalBottomSheet<Transaction>(
               useSafeArea: true,

@@ -25,6 +25,7 @@ class _WalletPageState extends State<WalletPage> {
     return Scaffold(
       backgroundColor: const Color(0xFFF7F8F8),
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: "wallet_fab",
         onPressed: () async {
           final draft = await showModalBottomSheet<GoalDraft>(
             useSafeArea: true,
