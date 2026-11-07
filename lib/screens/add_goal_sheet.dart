@@ -43,21 +43,24 @@ class _AddGoalSheetState extends State<AddGoalSheet> {
   void _save() {
     if (!_formKey.currentState!.validate()) return;
 
-    final Goal goal;
+    final title = _titleController.text.trim();
+    final targetAmount = double.parse(_targetController.text.trim());
 
-    if (isEditing){
-      goal = widget.initialGoal!.copyWith(
-        title: _titleController.text.trim(),
-        targetedAmount: double.tryParse(_targetController.text.trim()),
+    if (isEditing) {
+      final updatedGoal = widget.initialGoal!.copyWith(
+        title: title,
+        targetedAmount: targetAmount,
       );
-    }
-    else {
-      goal = Goal(
-        title: _titleController.text.trim(),
-        targetedAmount: double.parse(_targetController.text.trim()),
+
+      Navigator.of(context).pop(updatedGoal);
+    } else {
+      final draft = GoalDraft(
+        title: title,
+        targetedAmount: targetAmount,
       );
+
+      Navigator.of(context).pop(draft);
     }
-    Navigator.of(context).pop(goal);
   }
 
   @override
