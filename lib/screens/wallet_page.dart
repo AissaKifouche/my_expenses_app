@@ -26,7 +26,7 @@ class _WalletPageState extends State<WalletPage> {
       backgroundColor: const Color(0xFFF7F8F8),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
-          final newGoal = await showModalBottomSheet<Goal>(
+          final draft = await showModalBottomSheet<GoalDraft>(
             useSafeArea: true,
             isScrollControlled: true,
             constraints: BoxConstraints(
@@ -38,11 +38,13 @@ class _WalletPageState extends State<WalletPage> {
             },
           );
 
-          if (newGoal != null) {
-            setState(() {
-              widget.appData.addGoal(newGoal);
-            });
-          }
+          if (draft == null || !mounted) return;
+
+          await widget.appData.addGoal(draft);
+
+          if (!mounted) return;
+
+          setState(() {});
         },
         backgroundColor: const Color(0xFF2F948D),
         label: Text(
