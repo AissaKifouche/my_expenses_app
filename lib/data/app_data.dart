@@ -8,6 +8,7 @@ import '../database/Daos/currency_dao.dart' as cd;
 import '../database/Daos/app_settings_dao.dart' as asd;
 import '../database/Daos/wallet_dao.dart' as wd;
 import '../database/Daos/transaction_dao.dart' as td;
+import '../database/Daos/goal_dao.dart' as gd;
 import 'package:drift/drift.dart';
 
 class AppData {
@@ -18,12 +19,14 @@ class AppData {
   late final asd.AppSettingsDao _appSettingsDao;
   late final wd.WalletDao _walletDao;
   late final td.TransactionDao _transactionDao;
+  late final gd.GoalDao _goalDao;
 
   AppData(this.database) {
     _currencyDao = cd.CurrencyDao(database);
     _appSettingsDao = asd.AppSettingsDao(database);
     _walletDao = wd.WalletDao(database);
     _transactionDao = td.TransactionDao(database);
+    _goalDao = gd.GoalDao(database);
   }
 
 
@@ -47,9 +50,11 @@ class AppData {
     if (selectedCurrency.isEmpty) throw StateError("The selected currency was not found");
 
     currency = selectedCurrency.first;
-    isInitialized = true;
+
     wallet = (await _walletDao.getWallet()) ?? (throw StateError("Main wallet was not found"));
     transactions = await _transactionDao.getAll();
+    goals = await _goalDao.getGoals();
+    isInitialized = true;
   }
 
   Future<void> changeCurrency(Currency newCurrency) async {
@@ -260,46 +265,197 @@ class AppData {
   }
 
 
-  //add a goal to the list
-  void addGoal(Goal goal){
-    goals.add(goal);
+  //add a goal to the database
+  Future<Goal> addGoal(GoalDraft draft) async {
+    final savedGoal = await database.transaction(() async {
+      final id = await _goalDao.insertGoal(draft);
+      final goal = await _goalDao.getGoalById(id);
+      if (goal == null) {
+        throw StateError('Could not retrieve the inserted goal.');
+      }
+      return goal;
+    });
+    goals.add(savedGoal);
+    return savedGoal;
   }
 
 
-  bool addMoneyToGoal(String goalId, double amount){
-    if (wallet.balance < amount) {
-      return false;
-    }
+  Future<bool> addMoneyToGoal(int goalId, double amount) async {
+    if (amount <= 0 || !amount.isFinite) return false;
 
-    final goal = goals.firstWhere((g) => g.id == goalId);
-    wallet.balance -= amount;
-    goal.savedAmount += amount;
+    final result = await database.transaction(() async {
+      final currentWallet = await _walletDao.getWallet();
+      final currentGoal = await _goalDao.getGoalById(goalId);
+
+      if (currentWallet == null || currentGoal == null) {
+        return null;
+      }
+
+      if (currentWallet.balance < amount) {
+        return null;
+      }
+
+      final updatedGoal = Goal(
+        id: currentGoal.id,
+        title: currentGoal.title,
+        targetedAmount: currentGoal.targetedAmount,
+        savedAmount: currentGoal.savedAmount + amount,
+      );
+
+      final goalUpdated = await _goalDao.updateGoal(updatedGoal);
+
+      if (!goalUpdated) {
+        throw StateError('Could not update goal balance.');
+      }
+
+      final newWalletBalance = currentWallet.balance - amount;
+
+      final walletUpdated = await _walletDao.updateWallet(
+        currentWallet.id,
+        ad.WalletsCompanion(
+          balance: Value(newWalletBalance),
+        ),
+      );
+
+      if (!walletUpdated) {
+        throw StateError('Could not update wallet balance.');
+      }
+
+      return (
+      goal: updatedGoal,
+      walletBalance: newWalletBalance,
+      );
+    });
+
+    if (result == null) return false;
+
+    wallet.balance = result.walletBalance;
+
+    final index = goals.indexWhere((g) => g.id == goalId);
+    if (index != -1) {
+      goals[index] = result.goal;
+    }
 
     return true;
   }
 
-  bool removeMoneyFromGoal(String goalId, double amount){
-    final goal = goals.firstWhere((g) => g.id == goalId);
-    if (goal.savedAmount < amount ){
-      return false;
+  Future<bool> removeMoneyFromGoal(int goalId, double amount) async {
+    if (amount <= 0 || !amount.isFinite) return false;
+
+    final result = await database.transaction(() async {
+      final currentWallet = await _walletDao.getWallet();
+      final currentGoal = await _goalDao.getGoalById(goalId);
+
+      if (currentWallet == null || currentGoal == null) {
+        return null;
+      }
+
+      if (currentGoal.savedAmount < amount) {
+        return null;
+      }
+
+      final updatedGoal = Goal(
+        id: currentGoal.id,
+        title: currentGoal.title,
+        targetedAmount: currentGoal.targetedAmount,
+        savedAmount: currentGoal.savedAmount - amount,
+      );
+
+      final goalUpdated = await _goalDao.updateGoal(updatedGoal);
+
+      if (!goalUpdated) {
+        throw StateError('Could not update goal balance.');
+      }
+
+      final newWalletBalance = currentWallet.balance + amount;
+
+      final walletUpdated = await _walletDao.updateWallet(
+        currentWallet.id,
+        ad.WalletsCompanion(
+          balance: Value(newWalletBalance),
+        ),
+      );
+
+      if (!walletUpdated) {
+        throw StateError('Could not update wallet balance.');
+      }
+
+      return (
+      goal: updatedGoal,
+      walletBalance: newWalletBalance,
+      );
+    });
+
+    if (result == null) return false;
+
+    wallet.balance = result.walletBalance;
+
+    final index = goals.indexWhere((g) => g.id == goalId);
+    if (index != -1) {
+      goals[index] = result.goal;
     }
 
-    goal.savedAmount -= amount;
-    wallet.balance += amount;
     return true;
   }
 
-  void deleteGoal(String id){
-    int i = goals.indexWhere((test) => test.id == id);
-    wallet.balance += goals[i].savedAmount;
-    goals.removeAt(i);
+  Future<bool> deleteGoal(int id) async {
+    final result = await database.transaction(() async {
+      final currentGoal = await _goalDao.getGoalById(id);
+
+      if (currentGoal == null) {
+        return null;
+      }
+
+      final currentWallet = await _walletDao.getWallet();
+
+      if (currentWallet == null) {
+        throw StateError('Main wallet was not found.');
+      }
+
+      final deleted = await _goalDao.deleteGoal(id);
+
+      if (!deleted) {
+        return null;
+      }
+
+      // Return the goal's saved money to the wallet.
+      final newWalletBalance =
+          currentWallet.balance + currentGoal.savedAmount;
+
+      final walletUpdated = await _walletDao.updateWallet(
+        currentWallet.id,
+        ad.WalletsCompanion(
+          balance: Value(newWalletBalance),
+        ),
+      );
+
+      if (!walletUpdated) {
+        throw StateError('Could not update wallet balance.');
+      }
+
+      return newWalletBalance;
+    });
+
+    if (result == null) return false;
+
+    wallet.balance = result;
+    goals.removeWhere((g) => g.id == id);
+
+    return true;
   }
 
-  void editGoal(Goal updated){
-    int i = goals.indexWhere((test) => test.id == updated.id);
-    if(i != -1){
-      goals[i] = updated;
-    }
+  Future<bool> editGoal(Goal updated) async {
+    final index = goals.indexWhere((g) => g.id == updated.id);
+
+    if (index == -1) return false;
+
+    final success = await _goalDao.updateGoal(updated);
+
+    if (!success) return false;
+
+    goals[index] = updated;
+
+    return true;
   }
 
 
