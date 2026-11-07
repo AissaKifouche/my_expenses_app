@@ -1,8 +1,5 @@
-import 'package:uuid/uuid.dart';
-
-
 class MonthlyBudget {
-  final String id;
+  final int id;
   final int year;
   final int month;
   final double amount;
@@ -10,11 +7,12 @@ class MonthlyBudget {
   double spent;
 
   MonthlyBudget({
+    required this.id,
     required this.amount,
     required this.year,
     required this.month,
     this.spent = 0,
-}): id = Uuid().v4();
+});
 
   double get remaining => amount - spent;
 
@@ -25,4 +23,18 @@ class MonthlyBudget {
   void deleteExpense(double amount){
     spent -= amount;
   }
+}
+
+class MonthlyBudgetDraft {
+  final int year;
+  final int month;
+  final double amount;
+  final double spent;
+
+  MonthlyBudgetDraft({
+    required this.year,
+    required this.month,
+    required this.amount,
+    this.spent = 0,
+  });
 }
