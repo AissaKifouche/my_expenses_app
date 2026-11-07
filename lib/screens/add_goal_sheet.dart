@@ -123,9 +123,16 @@ class _AddGoalSheetState extends State<AddGoalSheet> {
                     style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w600),
                     decoration: _fieldDecoration('0.00', prefixText: '${widget.appData.currency.symbol} '),
                     validator: (v) {
-                      if (v == null || v.trim().isEmpty) return 'Enter a target amount';
+                      if (v == null || v.trim().isEmpty) {
+                        return 'Enter a target amount';
+                      }
                       final parsed = double.tryParse(v.trim());
-                      if (parsed == null || parsed <= 0) return 'Target amount must be greater than 0';
+                      if (parsed == null || !parsed.isFinite || parsed <= 0) {
+                        return 'Target amount must be greater than 0';
+                      }
+                      if (isEditing && parsed < widget.initialGoal!.savedAmount) {
+                        return 'Target cannot be less than the saved amount';
+                      }
                       return null;
                     },
                   ),
