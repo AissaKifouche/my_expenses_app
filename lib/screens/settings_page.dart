@@ -101,11 +101,23 @@ class _SettingsPageState extends State<SettingsPage> {
 
                         CurrencyContainerPicker(
                             selectedCurrency: widget.appData.currency,
-                            onCurrencySelected: (currency) {
-                              setState(() {
-                                widget.appData.currency = currency;
-                              });
-                            }, currencies: widget.appData.currencies,
+                            onCurrencySelected: (currency) async {
+                              try {
+                                await widget.appData.changeCurrency(currency);
+
+                                if (!mounted) return;
+                                setState(() {});
+                              } catch (e) {
+                                if (!mounted) return;
+
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('Failed to update currency: $e'),
+                                  ),
+                                );
+                              }
+                            },
+                            currencies: widget.appData.currencies,
                         ),
 
                       ],
