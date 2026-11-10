@@ -63,91 +63,87 @@ class _BudgetCardState extends State<BudgetCard> {
         ? const Color(0xFFFFC857)
         : Colors.white;
 
-    return InkWell(
-      borderRadius: BorderRadius.circular(20.r),
-      onTap: _addBudget,
-      child: Container(
-        width: double.infinity,
-        decoration: _cardDecoration,
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "Total Spent This Month",
-                    style: TextStyle(color: Colors.white70, fontSize: 14.sp, fontWeight: FontWeight.w500),
-                  ),
-                  if (isOver)
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(8.r),
-                      ),
-                      child: Text(
-                        'Over budget',
-                        style: TextStyle(color: Colors.white, fontSize: 11.sp, fontWeight: FontWeight.w600),
-                      ),
-                    ),
-                ],
-              ),
-
-              SizedBox(height: 6.h),
-
-              Text(
-                "${widget.appData.currency.symbol} ${budget.spent.toStringAsFixed(2)}",
-                style: TextStyle(fontSize: 30.sp, fontWeight: FontWeight.w700, color: Colors.white),
-              ),
-
-              SizedBox(height: 18.h),
-
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "Budget: ${widget.appData.currency.symbol} ${budget.amount.toStringAsFixed(2)}",
-                    style: TextStyle(fontSize: 13.sp, color: Colors.white70),
-                  ),
-                  Text(
-                    "Remaining: ${widget.appData.currency.symbol} ${budget.remaining.toStringAsFixed(2)}",
-                    style: TextStyle(fontSize: 13.sp, color: Colors.white70),
-                  ),
-                ],
-              ),
-
-              SizedBox(height: 12.h),
-
-              ClipRRect(
-                borderRadius: BorderRadius.circular(20.r),
-                child: LinearProgressIndicator(
-                  value: ratio,
-                  backgroundColor: Colors.white.withValues(alpha: 0.2),
-                  color: barColor,
-                  minHeight: 10.h,
+    return Container(
+      width: double.infinity,
+      decoration: _cardDecoration,
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Total Spent This Month",
+                  style: TextStyle(color: Colors.white70, fontSize: 14.sp, fontWeight: FontWeight.w500),
                 ),
-              ),
-
-              SizedBox(height: 12.h),
-
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "$percent% used",
-                    style: TextStyle(fontSize: 13.sp, color: Colors.white70, fontWeight: FontWeight.w500),
+                if (isOver)
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(8.r),
+                    ),
+                    child: Text(
+                      'Over budget',
+                      style: TextStyle(color: Colors.white, fontSize: 11.sp, fontWeight: FontWeight.w600),
+                    ),
                   ),
-                  Text(
-                    "${Times.getRemainingDaysInMonth()} left",
-                    style: TextStyle(fontSize: 13.sp, color: Colors.white70, fontWeight: FontWeight.w500),
-                  ),
-                ],
+              ],
+            ),
+
+            SizedBox(height: 6.h),
+
+            Text(
+              "${widget.appData.currency.symbol} ${budget.spent.toStringAsFixed(2)}",
+              style: TextStyle(fontSize: 30.sp, fontWeight: FontWeight.w700, color: Colors.white),
+            ),
+
+            SizedBox(height: 18.h),
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Budget: ${widget.appData.currency.symbol} ${budget.amount.toStringAsFixed(2)}",
+                  style: TextStyle(fontSize: 13.sp, color: Colors.white70),
+                ),
+                Text(
+                  "Remaining: ${widget.appData.currency.symbol} ${budget.remaining.toStringAsFixed(2)}",
+                  style: TextStyle(fontSize: 13.sp, color: Colors.white70),
+                ),
+              ],
+            ),
+
+            SizedBox(height: 12.h),
+
+            ClipRRect(
+              borderRadius: BorderRadius.circular(20.r),
+              child: LinearProgressIndicator(
+                value: ratio,
+                backgroundColor: Colors.white.withValues(alpha: 0.2),
+                color: barColor,
+                minHeight: 10.h,
               ),
-            ],
-          ),
+            ),
+
+            SizedBox(height: 12.h),
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "$percent% used",
+                  style: TextStyle(fontSize: 13.sp, color: Colors.white70, fontWeight: FontWeight.w500),
+                ),
+                Text(
+                  "${Times.getRemainingDaysInMonth()} left",
+                  style: TextStyle(fontSize: 13.sp, color: Colors.white70, fontWeight: FontWeight.w500),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );
