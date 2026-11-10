@@ -14,14 +14,14 @@ import 'tables/transactions.dart';
 import 'tables/goals.dart';
 import 'tables/monthly_budgets.dart';
 
-import 'Daos/currency_dao.dart';
-import 'Daos/app_settings_dao.dart';
-import 'Daos/wallet_dao.dart';
-import 'Daos/transaction_dao.dart';
-import 'Daos/goal_dao.dart';
-import 'Daos/monthly_budget_dao.dart';
-import 'Daos/category_dao.dart';
-import 'Daos/transaction_type_dao.dart';
+import 'daos/currency_dao.dart';
+import 'daos/app_settings_dao.dart';
+import 'daos/wallet_dao.dart';
+import 'daos/transaction_dao.dart';
+import 'daos/goal_dao.dart';
+import 'daos/monthly_budget_dao.dart';
+import 'daos/category_dao.dart';
+import 'daos/transaction_type_dao.dart';
 
 part 'app_database.g.dart';
 

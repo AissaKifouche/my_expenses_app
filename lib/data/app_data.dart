@@ -4,12 +4,12 @@ import 'package:my_expenses/models/transaction.dart';
 import 'package:my_expenses/models/wallet.dart';
 import 'package:my_expenses/widgets/currency.dart';
 import '../database/app_database.dart' as ad;
-import '../database/Daos/currency_dao.dart' as cd;
-import '../database/Daos/app_settings_dao.dart' as asd;
-import '../database/Daos/wallet_dao.dart' as wd;
-import '../database/Daos/transaction_dao.dart' as td;
-import '../database/Daos/goal_dao.dart' as gd;
-import '../database/Daos/monthly_budget_dao.dart' as mbd;
+import '../database/daos/currency_dao.dart' as cd;
+import '../database/daos/app_settings_dao.dart' as asd;
+import '../database/daos/wallet_dao.dart' as wd;
+import '../database/daos/transaction_dao.dart' as td;
+import '../database/daos/goal_dao.dart' as gd;
+import '../database/daos/monthly_budget_dao.dart' as mbd;
 import 'package:drift/drift.dart';
 
 class AppData {
