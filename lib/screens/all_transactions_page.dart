@@ -17,6 +17,24 @@ class _AllTransactionsPageState extends State<AllTransactionsPage> {
   static const _teal = Color(0xFF219289);
 
   TransactionType? _typeFilter; // null = show all
+  DateTimeRange? _dateRange; // null = no date filter
+
+  Future<void> _pickDateRange () async {
+    final now = DateTime.now();
+    final picked = await showDateRangePicker(
+      context: context,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(now.year + 1, 12, 31),
+      initialDateRange: _dateRange,
+      builder: (context, child) => Theme(
+        data: Theme.of(context).copyWith(colorScheme: ColorScheme.light(primary: _teal)),
+        child: child!,
+      ),
+    );
+
+    if (picked == null || !mounted) return;
+    setState( () => _dateRange = picked);
+  }
 
   String _sectionLabel(DateTime date) {
     final now = DateTime.now();
@@ -35,9 +53,18 @@ class _AllTransactionsPageState extends State<AllTransactionsPage> {
     final all = [...widget.appData.transactions]
       ..sort((a, b) => b.dateTime.compareTo(a.dateTime));
 
-    final filtered = _typeFilter == null
-        ? all
-        : all.where((t) => t.transactionType == _typeFilter).toList();
+    final filtered = all.where(
+        (t) {
+          if (_typeFilter != null && t.transactionType != _typeFilter) return false;
+          if (_dateRange != null) {
+            final day = DateTime(t.dateTime.year, t.dateTime.month, t.dateTime.day);
+            final start = DateTime(_dateRange!.start.year, _dateRange!.start.month, _dateRange!.start.day);
+            final end = DateTime(_dateRange!.end.year, _dateRange!.end.month, _dateRange!.end.day);
+            if (day.isBefore(start) || day.isAfter(end)) return false;
+          }
+          return true;
+        }
+    ).toList();
 
     // group by day
     final Map<String, List<Transaction>> grouped = {};
@@ -84,6 +111,39 @@ class _AllTransactionsPageState extends State<AllTransactionsPage> {
             ),
           ),
 
+          Padding(
+            padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 4.h),
+            child: Row(
+              children: [
+                _FilterChip(
+                  label: _dateRange == null ?
+                    'Select Dates'
+                    : '${DateFormat('MMM dd, yyyy').format(_dateRange!.start)} - ${DateFormat('MMM dd, yyyy').format(_dateRange!.end)}',
+                  selected: _dateRange != null,
+                  onTap: _pickDateRange
+                ),
+
+                if (_dateRange != null) ...[
+                  SizedBox(width: 8.w,),
+                  InkWell(
+                    borderRadius: BorderRadius.circular(20.r),
+                    onTap: () => setState(() {
+                      _dateRange = null;
+                    }),
+                    child: Padding(
+                      padding: EdgeInsets.all(6.r),
+                      child: Icon(
+                        Icons.close_rounded,
+                        size: 18.sp,
+                        color: Colors.black45,
+                      ),
+                    ),
+                  )
+                ]
+              ],
+            ),
+          ),
+
           Expanded(
             child: filtered.isEmpty
                 ? Center(
@@ -93,7 +153,9 @@ class _AllTransactionsPageState extends State<AllTransactionsPage> {
                   Icon(Icons.receipt_long_outlined, size: 32.sp, color: Colors.black26),
                   SizedBox(height: 10.h),
                   Text(
-                    _typeFilter == null ? 'No transactions yet' : 'No matching transactions',
+                    _typeFilter == null && _dateRange == null ?
+                        "No transactions yet"
+                        : "No matching transactions",
                     style: TextStyle(color: Colors.black45, fontSize: 14.sp),
                   ),
                 ],
