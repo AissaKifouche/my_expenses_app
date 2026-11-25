@@ -15,9 +15,35 @@ Maliya is a personal finance management application built with Flutter. It helps
 - **Currency Selection:** Choose a preferred currency for displaying financial amounts.
 - **Local Data Storage:** Persist application data locally using SQLite.
 
+
 ## Screenshots
 
-<!-- Screenshots will be added here. -->
+
+<table>
+  <tr>
+    <th>Home</th>
+    <th>All Transactions</th>
+  </tr>
+  <tr>
+    <td align="center"><img src="assets/screenshots/home.png" width="250"></td>
+    <td align="center"><img src="assets/screenshots/all_transactions.png" width="250"></td>
+  </tr>
+  <tr>
+    <th>Statistics</th>
+    <th>Wallet and Goals</th>
+  </tr>
+  <tr>
+    <td align="center"><img src="assets/screenshots/stats.png" width="250"></td>
+    <td align="center"><img src="assets/screenshots/wallet.png" width="250"></td>
+  </tr>
+  <tr>
+    <th colspan="2">Settings</th>
+  </tr>
+  <tr>
+    <td colspan="2" align="center"><img src="assets/screenshots/settings.png" width="250"></td>
+  </tr>
+</table>
+
 
 ## Built With
 
