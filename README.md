@@ -1,8 +1,10 @@
-# My Expenses
+# Maliya
 
-My Expenses is a personal finance management application built with Flutter. It helps users track their income and expenses, manage their monthly budgets, monitor their savings goals, and keep an overview of their financial activity.
+<p align="center">
+  <img src="assets/icon/app icon.png" alt="Maliya App Icon" width="180">
+</p>
 
-## Features
+Maliya is a personal finance management application built with Flutter. It helps users track their income and expenses, manage their monthly budgets, monitor their savings goals, and keep an overview of their financial activity.## Features
 
 - **Transaction Management:** Create, edit, delete, and browse income and expense transactions.
 - **Transaction Filtering:** Filter transactions by date range and transaction type (income or expense).
