@@ -30,7 +30,8 @@ class MyApp extends StatelessWidget {
       designSize: Size(412, 917),
       minTextAdapt: true,
       child: MaterialApp(
-        title: 'My Expenses',
+        title: 'Maliya',
+        debugShowCheckedModeBanner: false,
         home: MainShell(),
       ),
     );
