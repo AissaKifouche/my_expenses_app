@@ -1,10 +1,13 @@
+
 # Maliya
 
 <p align="center">
-  <img src="assets/icon/app icon.png" alt="Maliya App Icon" width="180">
+  <img src="assets/icon/Maliya_icon.png" alt="Maliya App Icon" width="180">
 </p>
 
-Maliya is a personal finance management application built with Flutter. It helps users track their income and expenses, manage their monthly budgets, monitor their savings goals, and keep an overview of their financial activity.## Features
+Maliya is a personal finance management application built with Flutter. It helps users track their income and expenses, manage their monthly budgets, monitor their savings goals, and keep an overview of their financial activity.
+
+## Features
 
 - **Transaction Management:** Create, edit, delete, and browse income and expense transactions.
 - **Transaction Filtering:** Filter transactions by date range and transaction type (income or expense).
@@ -15,9 +18,7 @@ Maliya is a personal finance management application built with Flutter. It helps
 - **Currency Selection:** Choose a preferred currency for displaying financial amounts.
 - **Local Data Storage:** Persist application data locally using SQLite.
 
-
 ## Screenshots
-
 
 <table>
   <tr>
@@ -44,7 +45,6 @@ Maliya is a personal finance management application built with Flutter. It helps
   </tr>
 </table>
 
-
 ## Built With
 
 - **[Flutter](https://flutter.dev/)** — Cross-platform UI framework.
@@ -61,9 +61,10 @@ Maliya is a personal finance management application built with Flutter. It helps
 
 ## Database
 
-My Expenses uses **SQLite** with **Drift** to store application data locally on the device.
+Maliya uses **SQLite** with **Drift** to store application data locally on the device.
 
 The database manages:
+
 - Wallet information and balance.
 - Income and expense transactions.
 - Transaction categories and types.
@@ -73,7 +74,7 @@ The database manages:
 
 ## Project Status
 
-My Expenses is currently under development. New features, improvements, and bug fixes may be introduced in future updates.
+Maliya is currently under development. New features, improvements, and bug fixes may be introduced in future updates.
 
 ## License
 
