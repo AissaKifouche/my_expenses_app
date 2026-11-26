@@ -108,11 +108,12 @@ class TransactionDao extends DatabaseAccessor<AppDatabase> with _$TransactionDao
 
   model.Transaction _toTransactionModel(Transaction row, String typeName, String categoryName) {
     return model.Transaction(
-        id: row.id,
-        transactionType: model.TransactionType.values.byName(typeName),
-        category: model.Category.values.byName(categoryName),
-        dateTime: row.dateAndTime,
-        amount: row.amount,
+      id: row.id,
+      transactionType: model.TransactionType.values.byName(typeName),
+      category: model.Category.values.byName(categoryName),
+      dateTime: row.dateAndTime,
+      amount: row.amount,
+      note: row.note,
     );
   }
 
