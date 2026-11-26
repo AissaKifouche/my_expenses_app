@@ -68,21 +68,30 @@ class TransactionCard extends StatelessWidget {
             ),
             SizedBox(width: 14.w),
 
-            // title + date
+            //
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    transaction.title,
+                    TransactionDetailPage.categoryLabel(transaction.category),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w500, color: Colors.black87),
+                    style: TextStyle(
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.black87,
+                    ),
                   ),
-                  SizedBox(height: 4.h),
+
+                  SizedBox(height: 4.h,),
+
                   Text(
                     Times.formatRelativeDate(transaction.dateTime),
-                    style: TextStyle(fontSize: 13.sp, color: Colors.grey[600]),
+                    style: TextStyle(
+                      fontSize: 13.sp,
+                      color: Colors.grey[600],
+                    ),
                   ),
                 ],
               ),
