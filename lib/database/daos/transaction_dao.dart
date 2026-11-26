@@ -68,7 +68,6 @@ class TransactionDao extends DatabaseAccessor<AppDatabase> with _$TransactionDao
 
     return into(transactions).insert(
       TransactionsCompanion.insert(
-        title: transaction.title,
         transactionTypeId: typeId,
         categoryId: categoryId,
         dateAndTime: transaction.dateTime,
@@ -87,12 +86,11 @@ class TransactionDao extends DatabaseAccessor<AppDatabase> with _$TransactionDao
     final count = await (update(transactions)
       ..where((t) => t.id.equals(id)))
         .write(
-        TransactionsCompanion.insert(
-          title: transaction.title,
-          transactionTypeId: typeId,
-          categoryId: categoryId,
-          dateAndTime: transaction.dateTime,
-          amount: transaction.amount,
+        TransactionsCompanion(
+          transactionTypeId: Value(typeId),
+          categoryId: Value(categoryId),
+          dateAndTime: Value(transaction.dateTime),
+          amount: Value(transaction.amount),
           note: Value(transaction.note),
         ));
 
@@ -111,7 +109,6 @@ class TransactionDao extends DatabaseAccessor<AppDatabase> with _$TransactionDao
   model.Transaction _toTransactionModel(Transaction row, String typeName, String categoryName) {
     return model.Transaction(
         id: row.id,
-        title: row.title,
         transactionType: model.TransactionType.values.byName(typeName),
         category: model.Category.values.byName(categoryName),
         dateTime: row.dateAndTime,
