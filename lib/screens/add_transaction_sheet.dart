@@ -22,7 +22,6 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
   static const _expense = Colors.red;
 
   final _formKey = GlobalKey<FormState>();
-  late final TextEditingController _titleController ;
   late final TextEditingController _amountController ;
   late final TextEditingController _noteController ;
 
@@ -39,7 +38,6 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
     super.initState();
     final t = widget.initialTransaction;
 
-    _titleController = TextEditingController(text: t?.title ?? '');
     _amountController = TextEditingController(
       text: t != null ? t.amount.toStringAsFixed(2) : '',
     );
@@ -54,7 +52,6 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
 
   @override
   void dispose() {
-    _titleController.dispose();
     _amountController.dispose();
     _noteController.dispose();
     super.dispose();
@@ -106,7 +103,6 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
 
-    final title = _titleController.text.trim();
     final amount = double.parse(_amountController.text.trim());
     final note = _noteController.text.trim().isEmpty
         ? null
@@ -115,7 +111,6 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
     try {
       if (isEditing) {
         final updated = widget.initialTransaction!.copyWith(
-          title: title,
           transactionType: _type,
           category: _category,
           dateTime: _dateTime,
@@ -129,7 +124,6 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
         Navigator.of(context).pop(updated);
       } else {
         final draft = TransactionDraft(
-          title: title,
           transactionType: _type,
           category: _category,
           dateTime: _dateTime,
@@ -237,15 +231,7 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
                   const Divider(height: 24, color: Color(0xFFF0F0F0)),
 
                   // Title Input
-                  const _FieldLabel('Title'),
-                  SizedBox(height: 6.h),
-                  TextFormField(
-                    controller: _titleController,
-                    style: TextStyle(fontSize: 15.sp),
-                    decoration: _fieldDecoration('e.g. Grocery run'),
-                    validator: (v) => (v == null || v.trim().isEmpty) ? 'Enter a title' : null,
-                  ),
-                  SizedBox(height: 16.h),
+
 
                   // Category Selector
                   const _FieldLabel('Category'),
