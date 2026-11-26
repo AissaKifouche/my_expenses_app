@@ -15,7 +15,7 @@ class DatabaseBackup {
     return {
       'app': app,
       'backupVersion': backupVersion,
-      'createdAt': createdAt,
+      'createdAt': createdAt.toIso8601String(),
       'data': data,
     };
   }
