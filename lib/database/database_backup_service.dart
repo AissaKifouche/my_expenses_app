@@ -1,5 +1,5 @@
 import 'package:drift/drift.dart';
-
+import 'dart:convert';
 import 'app_database.dart';
 import 'database_backup.dart';
 
@@ -109,6 +109,13 @@ class DatabaseBackupService {
       backupVersion: 1,
       createdAt: DateTime.now().toUtc(),
       data: backupData.toJson(),
+    );
+  }
+
+  //converts DatabaseBackup object into JSON text
+  String encodeBackup(DatabaseBackup backup) {
+    return const JsonEncoder.withIndent('  ').convert(
+      backup.toJson(),
     );
   }
 
