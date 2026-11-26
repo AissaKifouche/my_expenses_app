@@ -13,7 +13,6 @@ enum Category {
 
 class Transaction {
   final int id;
-  final String title;
   final TransactionType transactionType;
   final Category category;
   final DateTime dateTime;
@@ -22,7 +21,6 @@ class Transaction {
 
   Transaction({
     required this.id,
-    required this.title,
     required this.transactionType,
     required this.category,
     required this.dateTime,
@@ -33,7 +31,6 @@ class Transaction {
   // private constructor used only by copyWith, to preserve the original id
   Transaction._({
     required this.id,
-    required this.title,
     required this.transactionType,
     required this.category,
     required this.dateTime,
@@ -42,7 +39,6 @@ class Transaction {
   });
 
   Transaction copyWith({
-    String? title,
     TransactionType? transactionType,
     Category? category,
     DateTime? dateTime,
@@ -51,7 +47,6 @@ class Transaction {
   }) {
     return Transaction._(
       id: id, // always keeps the original id
-      title: title ?? this.title,
       transactionType: transactionType ?? this.transactionType,
       category: category ?? this.category,
       dateTime: dateTime ?? this.dateTime,
@@ -63,7 +58,6 @@ class Transaction {
 
 //a draft class to use it when creating and inserting transactions ( no id field)
 class TransactionDraft {
-  final String title;
   final TransactionType transactionType;
   final Category category;
   final DateTime dateTime;
@@ -71,7 +65,6 @@ class TransactionDraft {
   final String? note;
 
   TransactionDraft({
-    required this.title,
     required this.transactionType,
     required this.category,
     required this.dateTime,
