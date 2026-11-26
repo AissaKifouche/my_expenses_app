@@ -254,8 +254,12 @@ class _Header extends StatelessWidget {
           ),
           SizedBox(height: 28.h),
           Text(
-            transaction.title,
-            style: TextStyle(color: Colors.white, fontSize: 18.sp, fontWeight: FontWeight.w500),
+            TransactionDetailPage.categoryLabel(transaction.category),
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 18.sp,
+              fontWeight: FontWeight.w500,
+            ),
           ),
           SizedBox(height: 6.h),
           Text(
