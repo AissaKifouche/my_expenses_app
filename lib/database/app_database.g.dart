@@ -1248,15 +1248,6 @@ class $TransactionsTable extends Transactions
       'PRIMARY KEY AUTOINCREMENT',
     ),
   );
-  static const VerificationMeta _titleMeta = const VerificationMeta('title');
-  @override
-  late final GeneratedColumn<String> title = GeneratedColumn<String>(
-    'title',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
   static const VerificationMeta _transactionTypeIdMeta = const VerificationMeta(
     'transactionTypeId',
   );
@@ -1318,7 +1309,6 @@ class $TransactionsTable extends Transactions
   @override
   List<GeneratedColumn> get $columns => [
     id,
-    title,
     transactionTypeId,
     categoryId,
     dateAndTime,
@@ -1339,14 +1329,6 @@ class $TransactionsTable extends Transactions
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
-    }
-    if (data.containsKey('title')) {
-      context.handle(
-        _titleMeta,
-        title.isAcceptableOrUnknown(data['title']!, _titleMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_titleMeta);
     }
     if (data.containsKey('transaction_type_id')) {
       context.handle(
@@ -1405,10 +1387,6 @@ class $TransactionsTable extends Transactions
         DriftSqlType.int,
         data['${effectivePrefix}id'],
       )!,
-      title: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}title'],
-      )!,
       transactionTypeId: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}transaction_type_id'],
@@ -1440,7 +1418,6 @@ class $TransactionsTable extends Transactions
 
 class Transaction extends DataClass implements Insertable<Transaction> {
   final int id;
-  final String title;
   final int transactionTypeId;
   final int categoryId;
   final DateTime dateAndTime;
@@ -1448,7 +1425,6 @@ class Transaction extends DataClass implements Insertable<Transaction> {
   final String? note;
   const Transaction({
     required this.id,
-    required this.title,
     required this.transactionTypeId,
     required this.categoryId,
     required this.dateAndTime,
@@ -1459,7 +1435,6 @@ class Transaction extends DataClass implements Insertable<Transaction> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
-    map['title'] = Variable<String>(title);
     map['transaction_type_id'] = Variable<int>(transactionTypeId);
     map['category_id'] = Variable<int>(categoryId);
     map['date_and_time'] = Variable<DateTime>(dateAndTime);
@@ -1473,7 +1448,6 @@ class Transaction extends DataClass implements Insertable<Transaction> {
   TransactionsCompanion toCompanion(bool nullToAbsent) {
     return TransactionsCompanion(
       id: Value(id),
-      title: Value(title),
       transactionTypeId: Value(transactionTypeId),
       categoryId: Value(categoryId),
       dateAndTime: Value(dateAndTime),
@@ -1489,7 +1463,6 @@ class Transaction extends DataClass implements Insertable<Transaction> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return Transaction(
       id: serializer.fromJson<int>(json['id']),
-      title: serializer.fromJson<String>(json['title']),
       transactionTypeId: serializer.fromJson<int>(json['transactionTypeId']),
       categoryId: serializer.fromJson<int>(json['categoryId']),
       dateAndTime: serializer.fromJson<DateTime>(json['dateAndTime']),
@@ -1502,7 +1475,6 @@ class Transaction extends DataClass implements Insertable<Transaction> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
-      'title': serializer.toJson<String>(title),
       'transactionTypeId': serializer.toJson<int>(transactionTypeId),
       'categoryId': serializer.toJson<int>(categoryId),
       'dateAndTime': serializer.toJson<DateTime>(dateAndTime),
@@ -1513,7 +1485,6 @@ class Transaction extends DataClass implements Insertable<Transaction> {
 
   Transaction copyWith({
     int? id,
-    String? title,
     int? transactionTypeId,
     int? categoryId,
     DateTime? dateAndTime,
@@ -1521,7 +1492,6 @@ class Transaction extends DataClass implements Insertable<Transaction> {
     Value<String?> note = const Value.absent(),
   }) => Transaction(
     id: id ?? this.id,
-    title: title ?? this.title,
     transactionTypeId: transactionTypeId ?? this.transactionTypeId,
     categoryId: categoryId ?? this.categoryId,
     dateAndTime: dateAndTime ?? this.dateAndTime,
@@ -1531,7 +1501,6 @@ class Transaction extends DataClass implements Insertable<Transaction> {
   Transaction copyWithCompanion(TransactionsCompanion data) {
     return Transaction(
       id: data.id.present ? data.id.value : this.id,
-      title: data.title.present ? data.title.value : this.title,
       transactionTypeId: data.transactionTypeId.present
           ? data.transactionTypeId.value
           : this.transactionTypeId,
@@ -1550,7 +1519,6 @@ class Transaction extends DataClass implements Insertable<Transaction> {
   String toString() {
     return (StringBuffer('Transaction(')
           ..write('id: $id, ')
-          ..write('title: $title, ')
           ..write('transactionTypeId: $transactionTypeId, ')
           ..write('categoryId: $categoryId, ')
           ..write('dateAndTime: $dateAndTime, ')
@@ -1561,21 +1529,13 @@ class Transaction extends DataClass implements Insertable<Transaction> {
   }
 
   @override
-  int get hashCode => Object.hash(
-    id,
-    title,
-    transactionTypeId,
-    categoryId,
-    dateAndTime,
-    amount,
-    note,
-  );
+  int get hashCode =>
+      Object.hash(id, transactionTypeId, categoryId, dateAndTime, amount, note);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is Transaction &&
           other.id == this.id &&
-          other.title == this.title &&
           other.transactionTypeId == this.transactionTypeId &&
           other.categoryId == this.categoryId &&
           other.dateAndTime == this.dateAndTime &&
@@ -1585,7 +1545,6 @@ class Transaction extends DataClass implements Insertable<Transaction> {
 
 class TransactionsCompanion extends UpdateCompanion<Transaction> {
   final Value<int> id;
-  final Value<String> title;
   final Value<int> transactionTypeId;
   final Value<int> categoryId;
   final Value<DateTime> dateAndTime;
@@ -1593,7 +1552,6 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
   final Value<String?> note;
   const TransactionsCompanion({
     this.id = const Value.absent(),
-    this.title = const Value.absent(),
     this.transactionTypeId = const Value.absent(),
     this.categoryId = const Value.absent(),
     this.dateAndTime = const Value.absent(),
@@ -1602,20 +1560,17 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
   });
   TransactionsCompanion.insert({
     this.id = const Value.absent(),
-    required String title,
     required int transactionTypeId,
     required int categoryId,
     required DateTime dateAndTime,
     required double amount,
     this.note = const Value.absent(),
-  }) : title = Value(title),
-       transactionTypeId = Value(transactionTypeId),
+  }) : transactionTypeId = Value(transactionTypeId),
        categoryId = Value(categoryId),
        dateAndTime = Value(dateAndTime),
        amount = Value(amount);
   static Insertable<Transaction> custom({
     Expression<int>? id,
-    Expression<String>? title,
     Expression<int>? transactionTypeId,
     Expression<int>? categoryId,
     Expression<DateTime>? dateAndTime,
@@ -1624,7 +1579,6 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
-      if (title != null) 'title': title,
       if (transactionTypeId != null) 'transaction_type_id': transactionTypeId,
       if (categoryId != null) 'category_id': categoryId,
       if (dateAndTime != null) 'date_and_time': dateAndTime,
@@ -1635,7 +1589,6 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
 
   TransactionsCompanion copyWith({
     Value<int>? id,
-    Value<String>? title,
     Value<int>? transactionTypeId,
     Value<int>? categoryId,
     Value<DateTime>? dateAndTime,
@@ -1644,7 +1597,6 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
   }) {
     return TransactionsCompanion(
       id: id ?? this.id,
-      title: title ?? this.title,
       transactionTypeId: transactionTypeId ?? this.transactionTypeId,
       categoryId: categoryId ?? this.categoryId,
       dateAndTime: dateAndTime ?? this.dateAndTime,
@@ -1658,9 +1610,6 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
     final map = <String, Expression>{};
     if (id.present) {
       map['id'] = Variable<int>(id.value);
-    }
-    if (title.present) {
-      map['title'] = Variable<String>(title.value);
     }
     if (transactionTypeId.present) {
       map['transaction_type_id'] = Variable<int>(transactionTypeId.value);
@@ -1684,7 +1633,6 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
   String toString() {
     return (StringBuffer('TransactionsCompanion(')
           ..write('id: $id, ')
-          ..write('title: $title, ')
           ..write('transactionTypeId: $transactionTypeId, ')
           ..write('categoryId: $categoryId, ')
           ..write('dateAndTime: $dateAndTime, ')
@@ -3578,7 +3526,6 @@ typedef $$CategoriesTableProcessedTableManager =
 typedef $$TransactionsTableCreateCompanionBuilder =
     TransactionsCompanion Function({
       Value<int> id,
-      required String title,
       required int transactionTypeId,
       required int categoryId,
       required DateTime dateAndTime,
@@ -3588,7 +3535,6 @@ typedef $$TransactionsTableCreateCompanionBuilder =
 typedef $$TransactionsTableUpdateCompanionBuilder =
     TransactionsCompanion Function({
       Value<int> id,
-      Value<String> title,
       Value<int> transactionTypeId,
       Value<int> categoryId,
       Value<DateTime> dateAndTime,
@@ -3647,11 +3593,6 @@ class $$TransactionsTableFilterComposer
   });
   ColumnFilters<int> get id => $composableBuilder(
     column: $table.id,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get title => $composableBuilder(
-    column: $table.title,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -3731,11 +3672,6 @@ class $$TransactionsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get title => $composableBuilder(
-    column: $table.title,
-    builder: (column) => ColumnOrderings(column),
-  );
-
   ColumnOrderings<DateTime> get dateAndTime => $composableBuilder(
     column: $table.dateAndTime,
     builder: (column) => ColumnOrderings(column),
@@ -3809,9 +3745,6 @@ class $$TransactionsTableAnnotationComposer
   });
   GeneratedColumn<int> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
-
-  GeneratedColumn<String> get title =>
-      $composableBuilder(column: $table.title, builder: (column) => column);
 
   GeneratedColumn<DateTime> get dateAndTime => $composableBuilder(
     column: $table.dateAndTime,
@@ -3900,7 +3833,6 @@ class $$TransactionsTableTableManager
           updateCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
-                Value<String> title = const Value.absent(),
                 Value<int> transactionTypeId = const Value.absent(),
                 Value<int> categoryId = const Value.absent(),
                 Value<DateTime> dateAndTime = const Value.absent(),
@@ -3908,7 +3840,6 @@ class $$TransactionsTableTableManager
                 Value<String?> note = const Value.absent(),
               }) => TransactionsCompanion(
                 id: id,
-                title: title,
                 transactionTypeId: transactionTypeId,
                 categoryId: categoryId,
                 dateAndTime: dateAndTime,
@@ -3918,7 +3849,6 @@ class $$TransactionsTableTableManager
           createCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
-                required String title,
                 required int transactionTypeId,
                 required int categoryId,
                 required DateTime dateAndTime,
@@ -3926,7 +3856,6 @@ class $$TransactionsTableTableManager
                 Value<String?> note = const Value.absent(),
               }) => TransactionsCompanion.insert(
                 id: id,
-                title: title,
                 transactionTypeId: transactionTypeId,
                 categoryId: categoryId,
                 dateAndTime: dateAndTime,

@@ -5,7 +5,6 @@ import 'package:my_expenses/database/tables/transaction_types.dart';
 
 class Transactions extends Table {
   IntColumn get id => integer().autoIncrement()();
-  TextColumn get title => text()();
   IntColumn get transactionTypeId =>
       integer().references(TransactionTypes, #id)();
   IntColumn get categoryId =>
