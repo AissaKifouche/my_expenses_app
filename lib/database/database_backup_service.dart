@@ -94,4 +94,23 @@ class DatabaseBackupService {
   }
 
 
+
+  Future<DatabaseBackup> createBackup() async {
+    final backupData = BackupData(
+      settings: await _exportSettings(),
+      wallets: await _exportWallets(),
+      transactions: await _exportTransactions(),
+      goals: await _exportGoals(),
+      monthlyBudgets: await _exportMonthlyBudgets(),
+    );
+
+    return DatabaseBackup(
+      app: 'Maliya',
+      backupVersion: 1,
+      createdAt: DateTime.now().toUtc(),
+      data: backupData.toJson(),
+    );
+  }
+
+
 }
