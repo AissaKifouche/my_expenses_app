@@ -19,6 +19,13 @@ class CurrencyDao extends DatabaseAccessor<AppDatabase> with _$CurrencyDaoMixin 
     return query.getSingleOrNull();
   }
 
+  //get the code of the currency
+  Future<String?> getCurrencyCodeById(int id) async {
+    final currency = await getCurrencyById(id);
+    return currency?.code;
+  }
+
+
   Future<c.Currency?> getCurrencyModelById (int id,) async {
     final row = await getCurrencyById(id);
     return row == null ? null : _toCurrency(row);
