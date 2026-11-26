@@ -2,6 +2,8 @@ import 'package:drift/drift.dart';
 import 'dart:convert';
 import 'app_database.dart';
 import 'database_backup.dart';
+import 'package:file_picker/file_picker.dart';
+import 'dart:typed_data';
 
 class DatabaseBackupService {
   final AppDatabase database;
@@ -122,5 +124,24 @@ class DatabaseBackupService {
     );
   }
 
+  Future<Uri?> saveBackup() async {
+    // Create the backup data.
+    final backup = await createBackup();
+
+    // Convert the backup to formatted JSON.
+    final json = encodeBackup(backup);
+
+    // Convert the JSON string into bytes.
+    final bytes = Uint8List.fromList(utf8.encode(json));
+
+    // Let the user choose where to save the file.
+    return FilePicker.saveFile(
+      dialogTitle: 'Save Maliya Backup',
+      fileName:
+      'maliya_backup_${DateTime.now().toIso8601String().split('T').first}.json',
+      bytes: bytes,
+      mimeType: 'application/json'
+    );
+  }
 
 }
