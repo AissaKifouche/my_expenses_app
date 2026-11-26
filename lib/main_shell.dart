@@ -8,6 +8,7 @@ import 'package:my_expenses/screens/stats_page.dart';
 import 'package:my_expenses/screens/wallet_page.dart';
 import 'package:provider/provider.dart';
 import './database/app_database.dart';
+import 'database/database_backup_service.dart';
 
 
 class MainShell extends StatefulWidget {
@@ -19,7 +20,7 @@ class MainShell extends StatefulWidget {
 
 class _MainShellState extends State<MainShell> {
   late final AppData appData;
-  late final Future<void> initialization;
+  late Future<void> initialization;
 
   int _selectedIndex = 0;
 
