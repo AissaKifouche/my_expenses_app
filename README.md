@@ -9,7 +9,7 @@ Maliya is a personal finance management application built with Flutter. It helps
 
 ## Features
 
-- **Transaction Management:** Create, edit, delete, and browse income and expense transactions.
+- **Transaction Management:** Create, edit, delete, and browse income and expense transactions, with support for optional notes.
 - **Transaction Filtering:** Filter transactions by date range and transaction type (income or expense).
 - **Wallet Management:** Automatically update the wallet balance whenever a transaction is added, edited, or deleted.
 - **Monthly Budgets:** Set monthly spending limits and track expenses against those limits.
@@ -17,6 +17,7 @@ Maliya is a personal finance management application built with Flutter. It helps
 - **Statistics:** Visualize financial activity through monthly summaries and expense breakdowns.
 - **Currency Selection:** Choose a preferred currency for displaying financial amounts.
 - **Local Data Storage:** Persist application data locally using SQLite.
+- **Data Backup and Restore:** Export application data to JSON backup files and restore it whenever needed.
 
 ## Screenshots
 
@@ -61,7 +62,7 @@ Maliya is a personal finance management application built with Flutter. It helps
 
 ## Database
 
-Maliya uses **SQLite** with **Drift** to store application data locally on the device.
+Maliya uses **SQLite** with **Drift** to store application data locally on the device. Users can export their data as JSON backup files and restore it later.
 
 The database manages:
 
@@ -74,7 +75,7 @@ The database manages:
 
 ## Project Status
 
-Maliya is currently under development. New features, improvements, and bug fixes may be introduced in future updates.
+Maliya is an actively developed personal finance application. New features, improvements, and bug fixes may be introduced in future updates.
 
 ## License
 
