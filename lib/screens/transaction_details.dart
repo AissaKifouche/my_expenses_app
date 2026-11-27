@@ -22,6 +22,47 @@ class TransactionDetailPage extends StatelessWidget {
   bool get _isIncome => transaction.transactionType == TransactionType.income;
   Color get _accent => _isIncome ? _teal : _expense;
 
+
+  Future<bool> _confirmDelete(BuildContext context) async {
+    final amount =
+        '${appData.currency.symbol}${transaction.amount.toStringAsFixed(2)}';
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
+        icon: Icon(
+          Icons.delete_outline_rounded,
+          color: const Color(0xFFB3402B),
+          size: 40.sp,
+        ),
+        title: const Text('Delete transaction?'),
+        content: Text(
+          'Your ${categoryLabel(transaction.category).toLowerCase()} '
+              '${_isIncome ? 'income' : 'expense'} of $amount will be '
+              'permanently removed.\n\nThis action cannot be undone.',
+          textAlign: TextAlign.center,
+        ),
+        actionsAlignment: MainAxisAlignment.spaceBetween,
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: const Color(0xFFB3402B),
+            ),
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+
+    return confirmed == true;
+  }
+
   @override
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
@@ -93,6 +134,8 @@ class TransactionDetailPage extends StatelessWidget {
                     SizedBox(height: 32.h),
                     Row(
                       children: [
+
+                        //edit button
                         Expanded(
                           child: OutlinedButton.icon(
                             onPressed: () async {
@@ -108,7 +151,7 @@ class TransactionDetailPage extends StatelessWidget {
                                 }
                               );
 
-                              if (updated != null){
+                              if (updated != null && context.mounted) {
                                 onUpdate(updated);
                                 Navigator.of(context).pop();
                               }
@@ -124,11 +167,35 @@ class TransactionDetailPage extends StatelessWidget {
                           ),
                         ),
                         SizedBox(width: 12.w),
+
+                        //delete button
                         Expanded(
                           child: ElevatedButton.icon(
-                            onPressed: () {
+                            onPressed: () async {
+                              HapticFeedback.mediumImpact();
+
+                              final confirmed = await _confirmDelete(context);
+                              if (!confirmed || !context.mounted) return;
+
+                              // Grab the messenger before popping so we can still show feedback
+                              final messenger = ScaffoldMessenger.of(context);
+
                               onDelete(transaction.id);
                               Navigator.of(context).pop();
+
+                              HapticFeedback.heavyImpact();
+                              messenger
+                                ..hideCurrentSnackBar()
+                                ..showSnackBar(
+                                  SnackBar(
+                                    behavior: SnackBarBehavior.floating,
+                                    backgroundColor: const Color(0xFF06655E),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12.r),
+                                    ),
+                                    content: const Text('Transaction deleted'),
+                                  ),
+                                );
                             },
                             icon: const Icon(Icons.delete_outline_rounded, size: 18),
                             label: const Text('Delete'),
