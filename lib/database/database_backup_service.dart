@@ -172,4 +172,32 @@ class DatabaseBackupService {
     return backup;
   }
 
+
+  BackupData validateBackup(DatabaseBackup backup) {
+    // Check that this backup belongs to Maliya.
+    if (backup.app != 'Maliya') {
+      throw FormatException('This is not a Maliya backup.');
+    }
+
+    // Check whether we support this backup format.
+    if (backup.backupVersion != 1) {
+      throw FormatException(
+        'Unsupported backup version: ${backup.backupVersion}',
+      );
+    }
+
+    // Parse and validate the backup data structure.
+    final backupData = BackupData.fromJson(backup.data);
+
+    // Check the selected currency code.
+    final currencyCode =
+    backupData.settings['selectedCurrencyCode'];
+
+    if (currencyCode is! String || currencyCode.isEmpty) {
+      throw FormatException('Invalid selected currency.');
+    }
+
+    return backupData;
+  }
+
 }
