@@ -178,6 +178,38 @@ class _SettingsPageState extends State<SettingsPage> {
     return 'Replace current data with a saved backup file';
   }
 
+
+  Future<void> _pickCurrency() async {
+    if (_isBusy) return;
+
+    HapticFeedback.selectionClick();
+
+    final picked = await showCurrencyPickerSheet(
+      context,
+      currencies: widget.appData.currencies,
+      selected: widget.appData.currency,
+    );
+
+    if (picked == null ||
+        !mounted ||
+        picked.code == widget.appData.currency.code) {
+      return;
+    }
+
+    try {
+      await widget.appData.changeCurrency(picked);
+      if (!mounted) return;
+      setState(() {});
+      HapticFeedback.mediumImpact();
+      _showSnack('Currency changed to ${picked.code}');
+    } catch (e) {
+      if (!mounted) return;
+      HapticFeedback.heavyImpact();
+      _showSnack("Couldn't update currency. Please try again.", isError: true);
+      debugPrint('Currency error: $e');
+    }
+  }
+
   // ── UI ────────────────────────────────────────────────────
 
   @override
@@ -206,45 +238,15 @@ class _SettingsPageState extends State<SettingsPage> {
                 // ── Currency ──────────────────────────────────
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 20.w),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20.r),
-                      border: Border.all(color: Colors.grey.shade300),
-                    ),
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 20.w,
-                      vertical: 10.h,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "Currency",
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 20.sp,
-                          ),
-                        ),
-                        CurrencyContainerPicker(
-                          selectedCurrency: widget.appData.currency,
-                          onCurrencySelected: (currency) async {
-                            try {
-                              await widget.appData.changeCurrency(currency);
-
-                              if (!mounted) return;
-                              setState(() {});
-                            } catch (e) {
-                              if (!mounted) return;
-                              _showSnack(
-                                'Failed to update currency',
-                                isError: true,
-                              );
-                            }
-                          },
-                          currencies: widget.appData.currencies,
-                        ),
-                      ],
-                    ),
+                  child: _ActionTile(
+                    icon: Icons.payments_outlined,
+                    title: 'Currency',
+                    busyTitle: 'Currency',
+                    subtitle: 'Used for all amounts in the app',
+                    isBusy: false,
+                    isDisabled: _isBusy,
+                    onTap: _pickCurrency,
+                    trailing: CurrencyBadge(currency: widget.appData.currency),
                   ),
                 ),
 
@@ -290,8 +292,8 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 }
 
-/// Reusable settings action row with icon badge, subtitle,
-/// loading spinner, and disabled state.
+// Reusable settings action row with icon badge, subtitle,
+// loading spinner, and disabled state.
 class _ActionTile extends StatelessWidget {
   final IconData icon;
   final String title;
@@ -300,6 +302,7 @@ class _ActionTile extends StatelessWidget {
   final bool isBusy;
   final bool isDisabled;
   final VoidCallback onTap;
+  final Widget? trailing;
 
   const _ActionTile({
     required this.icon,
@@ -309,6 +312,7 @@ class _ActionTile extends StatelessWidget {
     required this.isBusy,
     required this.isDisabled,
     required this.onTap,
+    this.trailing,
   });
 
   @override
@@ -380,12 +384,17 @@ class _ActionTile extends StatelessWidget {
                       color: _brandColor,
                     ),
                   )
+                    :(trailing != null
+                      ? KeyedSubtree(
+                    key: const ValueKey('trailing'),
+                    child: trailing!,
+                  )
                       : Icon(
                     Icons.arrow_forward_ios,
                     key: const ValueKey('arrow'),
                     color: Colors.grey,
                     size: 16.sp,
-                  ),
+                  )),
                 ),
               ],
             ),
