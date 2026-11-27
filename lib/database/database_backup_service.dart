@@ -144,4 +144,32 @@ class DatabaseBackupService {
     );
   }
 
+  Future<DatabaseBackup?> readBackupFile() async {
+    // Let the user select a backup file.
+    final file = await FilePicker.pickFile(
+      type: FileType.custom,
+      allowedExtensions: ['json'],
+      dialogTitle: 'Select Maliya Backup',
+    );
+
+    // The user cancelled the picker.
+    if (file == null) return null;
+
+    // Read the file contents.
+    final bytes = await file.readAsBytes();
+
+    // Convert bytes into a JSON string.
+    final jsonString = utf8.decode(bytes);
+
+    // Decode JSON into a Dart object.
+    final decodedJson = jsonDecode(jsonString);
+
+    // Convert the decoded object into DatabaseBackup.
+    final backup = DatabaseBackup.fromJson(
+      Map<String, dynamic>.from(decodedJson as Map),
+    );
+
+    return backup;
+  }
+
 }
