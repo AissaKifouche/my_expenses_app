@@ -173,7 +173,7 @@ class DatabaseBackupService {
   }
 
 
-  BackupData validateBackup(DatabaseBackup backup) {
+  Future<BackupData> validateBackup(DatabaseBackup backup) async {
     // Check that this backup belongs to Maliya.
     if (backup.app != 'Maliya') {
       throw FormatException('This is not a Maliya backup.');
@@ -189,6 +189,7 @@ class DatabaseBackupService {
     // Parse and validate the backup data structure.
     final backupData = BackupData.fromJson(backup.data);
     _validateRecords(backupData);
+    await _validateReferences(backupData);
 
     // Check the selected currency code.
     final currencyCode =
@@ -286,6 +287,52 @@ class DatabaseBackupService {
 
       if (amount <= 0 || spent < 0) {
         throw FormatException('Invalid budget amounts.');
+      }
+    }
+  }
+
+  Future<void> _validateReferences(BackupData data) async {
+    // Get existing transaction types.
+    final types = await database.select(database.transactionTypes).get();
+
+    final typeNames = types.map((type) => type.name).toSet();
+
+    // Get existing categories.
+    final categories = await database.select(database.categories).get();
+
+    final categoryNames =
+    categories.map((category) => category.name).toSet();
+
+    // Get existing currencies.
+    final currencies = await database.select(database.currencies).get();
+
+    final currencyCodes =
+    currencies.map((currency) => currency.code).toSet();
+
+    // Validate selected currency.
+    final currencyCode = data.settings['selectedCurrencyCode'];
+
+    if (!currencyCodes.contains(currencyCode)) {
+      throw FormatException(
+        'Unsupported currency: $currencyCode',
+      );
+    }
+
+    // Validate transaction references.
+    for (final transaction in data.transactions) {
+      final type = transaction['transactionType'];
+      final category = transaction['category'];
+
+      if (!typeNames.contains(type)) {
+        throw FormatException(
+          'Unknown transaction type: $type',
+        );
+      }
+
+      if (!categoryNames.contains(category)) {
+        throw FormatException(
+          'Unknown transaction category: $category',
+        );
       }
     }
   }
