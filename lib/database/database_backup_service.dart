@@ -230,6 +230,11 @@ class DatabaseBackupService {
 
   void _validateRecords(BackupData data) {
     // Validate wallets.
+    if (data.wallets.length != 1) {
+      throw FormatException(
+        'A Maliya backup must contain exactly one wallet.',
+      );
+    }
     for (final wallet in data.wallets) {
       _requireString(wallet, 'name');
 
