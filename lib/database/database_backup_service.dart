@@ -188,16 +188,106 @@ class DatabaseBackupService {
 
     // Parse and validate the backup data structure.
     final backupData = BackupData.fromJson(backup.data);
+    _validateRecords(backupData);
 
     // Check the selected currency code.
     final currencyCode =
     backupData.settings['selectedCurrencyCode'];
 
-    if (currencyCode is! String || currencyCode.isEmpty) {
+    if (currencyCode is! String || currencyCode.trim().isEmpty) {
       throw FormatException('Invalid selected currency.');
     }
 
     return backupData;
+  }
+
+  double _requireNumber(
+      Map<String, dynamic> item,
+      String key,
+      ) {
+    final value = item[key];
+
+    if (value is! num || !value.toDouble().isFinite) {
+      throw FormatException('Invalid $key value.');
+    }
+
+    return value.toDouble();
+  }
+
+  String _requireString(
+      Map<String, dynamic> item,
+      String key,
+      ) {
+    final value = item[key];
+
+    if (value is! String || value.trim().isEmpty) {
+      throw FormatException('Invalid $key value.');
+    }
+
+    return value;
+  }
+
+  void _validateRecords(BackupData data) {
+    // Validate wallets.
+    for (final wallet in data.wallets) {
+      _requireString(wallet, 'name');
+
+      _requireNumber(wallet, 'balance');
+    }
+
+    // Validate transactions.
+    for (final transaction in data.transactions) {
+      _requireString(transaction, 'transactionType');
+      _requireString(transaction, 'category');
+
+      final date = transaction['dateAndTime'];
+
+      if (date is! String || DateTime.tryParse(date) == null) {
+        throw FormatException('Invalid transaction date.');
+      }
+
+      final amount = _requireNumber(transaction, 'amount');
+
+      if (amount <= 0) {
+        throw FormatException('Transaction amount must be positive.');
+      }
+
+      final note = transaction['note'];
+
+      if (note != null && note is! String) {
+        throw FormatException('Invalid transaction note.');
+      }
+    }
+
+    // Validate savings goals.
+    for (final goal in data.goals) {
+      _requireString(goal, 'name');
+
+      final target = _requireNumber(goal, 'targetAmount');
+      final saved = _requireNumber(goal, 'savedAmount');
+
+      if (target <= 0 || saved < 0 || saved > target) {
+        throw FormatException('Invalid savings goal amounts.');
+      }
+    }
+
+    // Validate monthly budgets.
+    for (final budget in data.monthlyBudgets) {
+      final year = budget['year'];
+      final month = budget['month'];
+
+      if (year is! int || year <= 0 || month is! int ||
+          month < 1 || month > 12) {
+        throw FormatException('Invalid budget date.');
+      }
+
+      final amount = _requireNumber(budget, 'amount');
+      final spent = _requireNumber(budget, 'spent');
+
+      if (amount <= 0 || spent < 0) {
+        throw FormatException('Invalid budget amounts.');
+      }
+    }
   }
 
 }
