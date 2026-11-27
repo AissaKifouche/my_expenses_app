@@ -83,6 +83,71 @@ class _SettingsPageState extends State<SettingsPage> {
     return 'Save a copy of your expenses to your device';
   }
 
+  Future<void> _restoreData() async {
+    try {
+      final backupService = DatabaseBackupService(
+        widget.appData.database,
+      );
+
+      // Select a backup file.
+      final backup = await backupService.readBackupFile();
+
+      if (backup == null || !mounted) return;
+
+      // Validate the selected backup.
+      final data = await backupService.validateBackup(backup);
+
+      if (!mounted) return;
+
+      // Ask for confirmation before replacing existing data.
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Restore backup?'),
+          content: const Text(
+            'This will replace all your current wallet, '
+                'transactions, goals, and budgets with the '
+                'data from this backup. This action cannot be undone.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Restore'),
+            ),
+          ],
+        ),
+      );
+
+      if (confirmed != true || !mounted) return;
+
+      // Restore database.
+      await backupService.restoreBackup(data);
+
+      // Refresh in-memory application data.
+      await widget.appData.initialize();
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Backup restored successfully!'),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to restore backup: $e'),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
