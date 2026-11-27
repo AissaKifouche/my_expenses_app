@@ -342,4 +342,88 @@ class DatabaseBackupService {
     }
   }
 
+  Future<void> restoreBackup(BackupData data) async {
+    await database.transaction(() async {
+      // 1. Delete existing user data.
+      await database.delete(database.transactions).go();
+      await database.delete(database.goals).go();
+      await database.delete(database.monthlyBudgets).go();
+      await database.delete(database.wallets).go();
+
+      // 2. Restore the wallet.
+      for (final wallet in data.wallets) {
+        await database.into(database.wallets).insert(
+          WalletsCompanion.insert(
+            name: wallet['name'] as String,
+            balance: wallet['balance'] as double,
+          ),
+        );
+      }
+
+      // 3. Restore goals.
+      for (final goal in data.goals) {
+        await database.into(database.goals).insert(
+          GoalsCompanion.insert(
+            name: goal['name'] as String,
+            targetAmount: goal['targetAmount'] as double,
+            savedAmount: Value(goal['savedAmount'] as double),
+          ),
+        );
+      }
+
+      // 4. Restore monthly budgets.
+      for (final budget in data.monthlyBudgets) {
+        await database.into(database.monthlyBudgets).insert(
+          MonthlyBudgetsCompanion.insert(
+            year: budget['year'] as int,
+            month: budget['month'] as int,
+            amount: budget['amount'] as double,
+            spent: Value(budget['spent'] as double),
+          ),
+        );
+      }
+
+      // 5. Restore transactions.
+      final types = await database.select(database.transactionTypes).get();
+      final categories = await database.select(database.categories).get();
+
+      for (final transaction in data.transactions) {
+        final type = types.firstWhere(
+              (item) => item.name == transaction['transactionType'],
+        );
+
+        final category = categories.firstWhere(
+              (item) => item.name == transaction['category'],
+        );
+
+        await database.into(database.transactions).insert(
+          TransactionsCompanion.insert(
+            transactionTypeId: type.id,
+            categoryId: category.id,
+            dateAndTime: DateTime.parse(
+              transaction['dateAndTime'] as String,
+            ),
+            amount: transaction['amount'] as double,
+            note: Value(transaction['note'] as String?),
+          ),
+        );
+      }
+
+      // 6. Restore selected currency.
+      final currencyCode = data.settings['selectedCurrencyCode'];
+
+      final currencies = await database.select(database.currencies).get();
+
+      final currency = currencies.firstWhere(
+            (item) => item.code == currencyCode,
+      );
+
+      await database.update(database.appSettings).write(
+        AppSettingsCompanion(
+          selectedCurrencyId: Value(currency.id),
+        ),
+      );
+    });
+  }
+
 }
