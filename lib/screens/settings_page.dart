@@ -7,6 +7,8 @@ import 'package:my_expenses/database/database_backup_service.dart';
 import 'package:my_expenses/database/app_database.dart';
 import 'package:provider/provider.dart';
 
+const _brandColor = Color(0xFF219289);
+
 class SettingsPage extends StatefulWidget {
   final AppData appData;
   const SettingsPage({super.key, required this.appData});
@@ -17,7 +19,10 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   bool _isBackingUp = false;
+  bool _isRestoring = false;
   DateTime? _lastBackup;
+
+  bool get _isBusy => _isBackingUp || _isRestoring;
 
   void _showSnack(String message, {bool isError = false}) {
     ScaffoldMessenger.of(context)
@@ -25,8 +30,7 @@ class _SettingsPageState extends State<SettingsPage> {
       ..showSnackBar(
         SnackBar(
           behavior: SnackBarBehavior.floating,
-          backgroundColor:
-          isError ? Colors.red.shade700 : const Color(0xFF219289),
+          backgroundColor: isError ? Colors.red.shade700 : _brandColor,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12.r),
           ),
@@ -45,8 +49,10 @@ class _SettingsPageState extends State<SettingsPage> {
       );
   }
 
+  // ── Backup ────────────────────────────────────────────────
+
   Future<void> _backupData() async {
-    if (_isBackingUp) return;
+    if (_isBusy) return;
 
     HapticFeedback.lightImpact();
     setState(() => _isBackingUp = true);
@@ -83,46 +89,67 @@ class _SettingsPageState extends State<SettingsPage> {
     return 'Save a copy of your expenses to your device';
   }
 
+  // ── Restore ───────────────────────────────────────────────
+
+  Future<bool> _confirmRestore() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20.r),
+        ),
+        icon: Icon(
+          Icons.warning_amber_rounded,
+          color: Colors.orange.shade700,
+          size: 40.sp,
+        ),
+        title: const Text('Restore backup?'),
+        content: const Text(
+          'This will replace all your current wallet, transactions, '
+              'goals, and budgets with the data from this backup.\n\n'
+              'This action cannot be undone.',
+        ),
+        actionsAlignment: MainAxisAlignment.spaceBetween,
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: Colors.red.shade700,
+            ),
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Replace my data'),
+          ),
+        ],
+      ),
+    );
+    return confirmed == true;
+  }
+
   Future<void> _restoreData() async {
+    if (_isBusy) return;
+
+    HapticFeedback.lightImpact();
+
     try {
-      final backupService = DatabaseBackupService(
-        widget.appData.database,
-      );
+      final backupService = DatabaseBackupService(widget.appData.database);
 
       // Select a backup file.
       final backup = await backupService.readBackupFile();
-
       if (backup == null || !mounted) return;
 
       // Validate the selected backup.
       final data = await backupService.validateBackup(backup);
-
       if (!mounted) return;
 
       // Ask for confirmation before replacing existing data.
-      final confirmed = await showDialog<bool>(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Restore backup?'),
-          content: const Text(
-            'This will replace all your current wallet, '
-                'transactions, goals, and budgets with the '
-                'data from this backup. This action cannot be undone.',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context, false),
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.pop(context, true),
-              child: const Text('Restore'),
-            ),
-          ],
-        ),
-      );
+      HapticFeedback.mediumImpact();
+      final confirmed = await _confirmRestore();
+      if (!confirmed || !mounted) return;
 
-      if (confirmed != true || !mounted) return;
+      setState(() => _isRestoring = true);
 
       // Restore database.
       await backupService.restoreBackup(data);
@@ -131,22 +158,27 @@ class _SettingsPageState extends State<SettingsPage> {
       await widget.appData.initialize();
 
       if (!mounted) return;
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Backup restored successfully!'),
-        ),
-      );
+      HapticFeedback.mediumImpact();
+      _showSnack('Backup restored successfully');
     } catch (e) {
       if (!mounted) return;
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Failed to restore backup: $e'),
-        ),
+      HapticFeedback.heavyImpact();
+      _showSnack(
+        "Couldn't restore backup. The file may be invalid or corrupted.",
+        isError: true,
       );
+      debugPrint('Restore error: $e');
+    } finally {
+      if (mounted) setState(() => _isRestoring = false);
     }
   }
+
+  String get _restoreSubtitle {
+    if (_isRestoring) return "Don't close the app";
+    return 'Replace current data with a saved backup file';
+  }
+
+  // ── UI ────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
@@ -156,7 +188,7 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: const Color(0xFF219289),
+          backgroundColor: _brandColor,
           title: Text(
             "Settings",
             style: TextStyle(
@@ -221,93 +253,140 @@ class _SettingsPageState extends State<SettingsPage> {
                 // ── Backup ────────────────────────────────────
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 20.w),
-                  child: Material(
-                    color: Colors.white,
-                    clipBehavior: Clip.antiAlias,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20.r),
-                      side: BorderSide(color: Colors.grey.shade300),
-                    ),
-                    child: InkWell(
-                      onTap: _isBackingUp ? null : _backupData,
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 16.w,
-                          vertical: 14.h,
-                        ),
-                        child: Row(
-                          children: [
-                            Container(
-                              padding: EdgeInsets.all(10.r),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF219289)
-                                    .withValues(alpha: 0.12),
-                                borderRadius: BorderRadius.circular(14.r),
-                              ),
-                              child: Icon(
-                                Icons.cloud_upload_outlined,
-                                color: const Color(0xFF219289),
-                                size: 26.sp,
-                              ),
-                            ),
-                            SizedBox(width: 16.w),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  AnimatedSwitcher(
-                                    duration: const Duration(milliseconds: 200),
-                                    child: Text(
-                                      _isBackingUp
-                                          ? 'Creating backup…'
-                                          : 'Backup Data',
-                                      key: ValueKey(_isBackingUp),
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 20.sp,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(height: 2.h),
-                                  Text(
-                                    _backupSubtitle,
-                                    style: TextStyle(
-                                      color: Colors.grey.shade600,
-                                      fontSize: 13.sp,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            SizedBox(width: 8.w),
-                            AnimatedSwitcher(
-                              duration: const Duration(milliseconds: 200),
-                              child: _isBackingUp
-                                  ? SizedBox(
-                                key: const ValueKey('loading'),
-                                width: 22.sp,
-                                height: 22.sp,
-                                child: const CircularProgressIndicator(
-                                  strokeWidth: 2.5,
-                                  color: Color(0xFF219289),
-                                ),
-                              )
-                                  : Icon(
-                                Icons.arrow_forward_ios,
-                                key: const ValueKey('arrow'),
-                                color: Colors.grey,
-                                size: 16.sp,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+                  child: _ActionTile(
+                    icon: Icons.cloud_upload_outlined,
+                    title: 'Backup Data',
+                    busyTitle: 'Creating backup…',
+                    subtitle: _backupSubtitle,
+                    isBusy: _isBackingUp,
+                    isDisabled: _isRestoring,
+                    onTap: _backupData,
+                  ),
+                ),
+
+                SizedBox(height: 15.h),
+
+                // ── Restore ───────────────────────────────────
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20.w),
+                  child: _ActionTile(
+                    icon: Icons.cloud_download_outlined,
+                    title: 'Restore Data',
+                    busyTitle: 'Restoring backup…',
+                    subtitle: _restoreSubtitle,
+                    isBusy: _isRestoring,
+                    isDisabled: _isBackingUp,
+                    onTap: _restoreData,
                   ),
                 ),
 
                 SizedBox(height: 30.h),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Reusable settings action row with icon badge, subtitle,
+/// loading spinner, and disabled state.
+class _ActionTile extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String busyTitle;
+  final String subtitle;
+  final bool isBusy;
+  final bool isDisabled;
+  final VoidCallback onTap;
+
+  const _ActionTile({
+    required this.icon,
+    required this.title,
+    required this.busyTitle,
+    required this.subtitle,
+    required this.isBusy,
+    required this.isDisabled,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final inactive = isBusy || isDisabled;
+
+    return AnimatedOpacity(
+      duration: const Duration(milliseconds: 200),
+      opacity: isDisabled ? 0.5 : 1,
+      child: Material(
+        color: Colors.white,
+        clipBehavior: Clip.antiAlias,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20.r),
+          side: BorderSide(color: Colors.grey.shade300),
+        ),
+        child: InkWell(
+          onTap: inactive ? null : onTap,
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+            child: Row(
+              children: [
+                Container(
+                  padding: EdgeInsets.all(10.r),
+                  decoration: BoxDecoration(
+                    color: _brandColor.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(14.r),
+                  ),
+                  child: Icon(icon, color: _brandColor, size: 26.sp),
+                ),
+                SizedBox(width: 16.w),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 200),
+                        child: Text(
+                          isBusy ? busyTitle : title,
+                          key: ValueKey(isBusy),
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 20.sp,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 2.h),
+                      Text(
+                        subtitle,
+                        style: TextStyle(
+                          color: Colors.grey.shade600,
+                          fontSize: 13.sp,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(width: 8.w),
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 200),
+                  child: isBusy
+                      ? SizedBox(
+                    key: const ValueKey('loading'),
+                    width: 22.sp,
+                    height: 22.sp,
+                    child: const CircularProgressIndicator(
+                      strokeWidth: 2.5,
+                      color: _brandColor,
+                    ),
+                  )
+                      : Icon(
+                    Icons.arrow_forward_ios,
+                    key: const ValueKey('arrow'),
+                    color: Colors.grey,
+                    size: 16.sp,
+                  ),
+                ),
               ],
             ),
           ),
