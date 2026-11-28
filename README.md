@@ -54,6 +54,33 @@ Maliya is a personal finance management application built with Flutter. It helps
 - **[SQLite](https://www.sqlite.org/)** — Local relational database.
 - **[Provider](https://pub.dev/packages/provider)** — Dependency injection for sharing the database instance across the widget tree.
 
+
+## Architecture
+
+Maliya follows a layered architecture that separates the user interface, application state management, and database operations.
+
+### Application Structure
+
+- **Presentation Layer:** Flutter screens and widgets responsible for displaying data and handling user interactions.
+- **State Management:** `AppData` manages the application's in-memory state and coordinates data operations between the UI and database.
+- **Database Layer:** Drift provides a type-safe interface for interacting with the local SQLite database.
+- **Data Access Objects (DAOs):** Separate DAOs handle database operations for transactions, wallets, goals, budgets, currencies, and application settings.
+- **Backup and Restore:** `DatabaseBackupService` handles JSON backup creation, validation, export, and restoration.
+
+### Data Flow
+
+1. The UI receives application state through `AppData`.
+2. User interactions trigger methods in `AppData`.
+3. `AppData` communicates with the appropriate DAOs.
+4. DAOs perform database operations through Drift.
+5. Updated data is reflected in the application state and displayed by the UI.
+
+### Database Management
+
+Maliya uses a single shared `AppDatabase` instance provided through Provider. The database is initialized when the application starts, and `AppData` loads the persisted data into memory.
+
+This approach keeps database access centralized and separates database operations from presentation logic.
+
 ## Installation
 
 1. Go to the [Releases](https://github.com/AissaKifouche/my_expenses_app/releases) page.
