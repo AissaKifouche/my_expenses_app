@@ -81,6 +81,72 @@ Maliya uses a single shared `AppDatabase` instance provided through Provider. Th
 
 This approach keeps database access centralized and separates database operations from presentation logic.
 
+
+## Project Structure
+
+```text
+lib/
+├── data/
+│   └── app_data.dart
+├── database/
+│   ├── daos/
+│   │   ├── app_settings_dao.dart
+│   │   ├── category_dao.dart
+│   │   ├── currency_dao.dart
+│   │   ├── goal_dao.dart
+│   │   ├── monthly_budget_dao.dart
+│   │   ├── transaction_dao.dart
+│   │   ├── transaction_type_dao.dart
+│   │   └── wallet_dao.dart
+│   ├── tables/
+│   │   ├── app_settings.dart
+│   │   ├── categories.dart
+│   │   ├── currencies.dart
+│   │   ├── goals.dart
+│   │   ├── monthly_budgets.dart
+│   │   ├── transactions.dart
+│   │   ├── transaction_types.dart
+│   │   └── wallets.dart
+│   ├── app_database.dart
+│   ├── database_backup.dart
+│   ├── database_backup_service.dart
+│   └── database_seeder.dart
+├── models/
+│   ├── goal.dart
+│   ├── monthly_budget.dart
+│   ├── transaction.dart
+│   └── wallet.dart
+├── screens/
+│   ├── add_goal_sheet.dart
+│   ├── add_transaction_sheet.dart
+│   ├── all_transactions_page.dart
+│   ├── goal_details.dart
+│   ├── home_page.dart
+│   ├── settings_page.dart
+│   ├── stats_page.dart
+│   ├── transaction_details.dart
+│   └── wallet_page.dart
+├── widgets/
+│   ├── add_budget_window.dart
+│   ├── budget_card.dart
+│   ├── currency.dart
+│   ├── goal_add_and_remove_money.dart
+│   ├── goal_card.dart
+│   ├── six_months_chart.dart
+│   └── transaction_card.dart
+├── buttom_clipper.dart
+├── main.dart
+└── main_shell.dart
+```
+
+### Directory Overview
+
+- **data/** — Application state management and coordination of data operations.
+- **database/** — Database configuration, Drift tables, DAOs, data seeding, and backup/restore functionality.
+- **models/** — Application data models representing transactions, wallets, goals, and monthly budgets.
+- **screens/** — Main application pages and screen-specific interfaces.
+- **widgets/** — Reusable UI components shared across different screens.
+
 ## Installation
 
 1. Go to the [Releases](https://github.com/AissaKifouche/my_expenses_app/releases) page.
