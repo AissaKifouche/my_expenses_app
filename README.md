@@ -147,6 +147,45 @@ lib/
 - **screens/** — Main application pages and screen-specific interfaces.
 - **widgets/** — Reusable UI components shared across different screens.
 
+
+## Technical Decisions
+
+### Database: Drift and SQLite
+
+Maliya uses Drift as its database layer on top of SQLite.
+
+Drift was chosen over a lower-level SQLite approach because it provides:
+- Type-safe database queries and operations.
+- Generated code for database access.
+- Dedicated Data Access Objects (DAOs) to organize database operations.
+- Support for transactions and schema migrations.
+
+### State Management: AppData and Provider
+
+Provider is used to make the shared database instance available across the application.
+
+`AppData` acts as the central coordinator for application data. It initializes and maintains in-memory data, communicates with the database through DAOs, and handles application operations involving multiple data entities.
+
+This separates database access and application logic from the presentation layer.
+### Database Migrations
+
+Maliya uses Drift's migration system to manage database schema changes.
+
+The database currently uses schema version 2. The migration from version 1 to version 2 removed the transaction title column while preserving compatible existing transaction data.
+
+### Database Transactions
+
+Drift transactions are used when an operation involves multiple related database changes.
+
+For example, adding an expense updates the transaction record, wallet balance, and monthly budget within a single database transaction. This helps maintain data consistency if an operation fails.
+
+### Data Backup and Restore
+
+Maliya provides JSON-based backup and restore functionality through a dedicated `DatabaseBackupService`.
+
+Backups store user data using stable identifiers such as currency codes and transaction category/type names rather than relying on database-generated IDs. Backup validation is performed before restoring data.
+
+
 ## Installation
 
 1. Go to the [Releases](https://github.com/AissaKifouche/my_expenses_app/releases) page.
